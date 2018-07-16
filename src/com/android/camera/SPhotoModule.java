@@ -134,7 +134,6 @@ public class SPhotoModule
     private static final String TAG = "CAM_SPhotoModule";
 
    //QCom data members
-    private static final int MAX_SHARPNESS_LEVEL = 6;
     private boolean mRestartPreview = false;
     private int mSnapshotMode;
     private int mBurstSnapNum = 1;
@@ -2913,22 +2912,24 @@ public class SPhotoModule
 
     private String getSaturationSafe() {
         String ret = null;
-        if (CameraUtil.isSupported(mParameters, "saturation") &&
-                CameraUtil.isSupported(mParameters, "max-saturation")) {
+        if (CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_CUR_SATURATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_MIN_SATURATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_MAX_SATURATION)) {
             ret = mPreferences.getString(
-                    CameraSettings.KEY_SATURATION,
-                    mActivity.getString(R.string.pref_camera_saturation_default));
+                    CameraSettings.KEY_EXYNOS_SATURATION,
+                    mActivity.getString(R.string.pref_camera_exy_saturation_default));
         }
         return ret;
     }
 
     private String getSharpnessSafe() {
         String ret = null;
-        if (CameraUtil.isSupported(mParameters, "sharpness") &&
-                CameraUtil.isSupported(mParameters, "max-sharpness")) {
+        if (CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_CUR_SATURATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_MIN_SATURATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_MAX_SATURATION)) {
             ret = mPreferences.getString(
-                    CameraSettings.KEY_SHARPNESS,
-                    mActivity.getString(R.string.pref_camera_sharpness_default));
+                    CameraSettings.KEY_EXYNOS_SHARPNESS,
+                    mActivity.getString(R.string.pref_camera_exy_sharpness_default));
         }
         return ret;
     }
@@ -2994,19 +2995,20 @@ public class SPhotoModule
         if (saturationStr != null) {
             int saturation = Integer.parseInt(saturationStr);
             Log.v(TAG, "Saturation value =" + saturation);
-            if((0 <= saturation) && (saturation <= ParametersWrapper.getMaxSaturation(mParameters))){
-                ParametersWrapper.setSaturation(mParameters, saturation);
+            if((saturation >= mParameters.getInt(CameraSettings.KEY_EXYNOS_MIN_SATURATION))
+                    && (saturation <= mParameters.getInt(CameraSettings.KEY_EXYNOS_MAX_SATURATION))) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_CUR_SATURATION, saturationStr);
             }
         }
 
         // Set sharpness parameter
         String sharpnessStr = getSharpnessSafe();
         if (sharpnessStr != null) {
-            int sharpness = Integer.parseInt(sharpnessStr) *
-                    (ParametersWrapper.getMaxSharpness(mParameters)/MAX_SHARPNESS_LEVEL);
+            int sharpness = Integer.parseInt(sharpnessStr);
             Log.v(TAG, "Sharpness value =" + sharpness);
-            if((0 <= sharpness) && (sharpness <= ParametersWrapper.getMaxSharpness(mParameters))){
-                ParametersWrapper.setSharpness(mParameters, sharpness);
+            if((sharpness >= mParameters.getInt(CameraSettings.KEY_EXYNOS_MIN_SHARPNESS))
+                    && (sharpness <= mParameters.getInt(CameraSettings.KEY_EXYNOS_MAX_SHARPNESS))) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_CUR_SHARPNESS, sharpness);
             }
         }
         // Set Face Recognition

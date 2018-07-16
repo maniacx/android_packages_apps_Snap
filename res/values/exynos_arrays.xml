@@ -1,0 +1,60 @@
+<!--
+    Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+
+    Not a Contribution.
+
+    Copyright (C) 2008 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+
+    <!-- Camera Preferences Sharpness entries -->
+    <string-array name="pref_camera_exy_sharpness_entries">
+        <item>@string/pref_camera_exy_sharpness_entry_level0</item>
+        <item>@string/pref_camera_exy_sharpness_entry_level1</item>
+        <item>@string/pref_camera_exy_sharpness_entry_level2</item>
+        <item>@string/pref_camera_exy_sharpness_entry_level3</item>
+        <item>@string/pref_camera_exy_sharpness_entry_level4</item>
+    </string-array>
+
+    <!-- Camera Preferences Saturation entries -->
+    <string-array name="pref_camera_exy_saturation_entries">
+        <item>@string/pref_camera_exy_saturation_entry_level0</item>
+        <item>@string/pref_camera_exy_saturation_entry_level1</item>
+        <item>@string/pref_camera_exy_saturation_entry_level2</item>
+        <item>@string/pref_camera_exy_saturation_entry_level3</item>
+        <item>@string/pref_camera_exy_saturation_entry_level4</item>
+    </string-array>
+
+    <!-- Camera Preferences Sharpness entries values -->
+    <string-array name="pref_camera_exy_sharpness_entryvalues">
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Camera Preferences Saturation entries values -->
+    <string-array name="pref_camera_exy_saturation_entryvalues">
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+</resources>
+

@@ -167,8 +167,8 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_SELFIE_MIRROR,
                 CameraSettings.KEY_SHUTTER_SOUND,
                 CameraSettings.KEY_POWER_SHUTTER,
-                CameraSettings.KEY_SATURATION,
-                CameraSettings.KEY_SHARPNESS,
+                CameraSettings.KEY_EXYNOS_SATURATION,
+                CameraSettings.KEY_EXYNOS_SHARPNESS,
                 CameraSettings.KEY_ANTIBANDING,
         };
 
@@ -186,8 +186,8 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_FOCUS_TIME,
                 CameraSettings.KEY_POWER_SHUTTER,
                 CameraSettings.KEY_MAX_BRIGHTNESS,
-                CameraSettings.KEY_SATURATION,
-                CameraSettings.KEY_SHARPNESS,
+                CameraSettings.KEY_EXYNOS_SATURATION,
+                CameraSettings.KEY_EXYNOS_SHARPNESS,
                 CameraSettings.KEY_ANTIBANDING,
                 CameraSettings.KEY_TIMER_SOUND_EFFECTS,
                 CameraSettings.KEY_FACE_RECOGNITION,
@@ -574,8 +574,8 @@ public class SPhotoMenu extends MenuController
         String faceDetection = (pref != null) ? pref.getValue() : null;
         if ((sceneMode != null) && !Parameters.SCENE_MODE_AUTO.equals(sceneMode)) {
             popup1.setPreferenceEnabled(CameraSettings.KEY_FOCUS_MODE, false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_SATURATION, false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_SHARPNESS, false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_COLOR_EFFECT, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE, false);
         }

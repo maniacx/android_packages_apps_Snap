@@ -291,6 +291,18 @@ public class CameraSettings {
     public static final int CURRENT_VERSION = 5;
     public static final int CURRENT_LOCAL_VERSION = 2;
 
+// Exynos5Camera
+    public static final String KEY_EXYNOS_SATURATION = "pref_camera_exy_saturation_key";
+    public static final String KEY_EXYNOS_SHARPNESS = "pref_camera_exy_sharpness_key";
+
+    public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
+    public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
+    public static final String KEY_EXYNOS_MAX_SATURATION = "saturation-max";
+    public static final String KEY_EXYNOS_CUR_SHARPNESS = "sharpness";
+    public static final String KEY_EXYNOS_MIN_SHARPNESS = "sharpness-min";
+    public static final String KEY_EXYNOS_MAX_SHARPNESS = "sharpness-max";
+// End of Exynos5Camera
+
     private static final String TAG = "CameraSettings";
 
     private final Context mContext;
@@ -1223,6 +1235,9 @@ public class CameraSettings {
         }
 
         qcomInitPreferences(group);
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            exynosInitPreferences(group);
+        }
     }
 
     private void buildExposureCompensation(
@@ -1822,5 +1837,22 @@ public class CameraSettings {
             }
         }
         return false;
+    }
+
+    private void exynosInitPreferences(PreferenceGroup group){
+        ListPreference exynos_saturation = group.findPreference(KEY_EXYNOS_SATURATION);
+        ListPreference exynos_sharpness = group.findPreference(KEY_EXYNOS_SHARPNESS);
+
+        if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MAX_SATURATION)) {
+            removePreference(group, exynos_saturation.getKey());
+        }
+
+        if (exynos_sharpness != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MAX_SATURATION)) {
+            removePreference(group, exynos_sharpness.getKey());
+        }
     }
 }
