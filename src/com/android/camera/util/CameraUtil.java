@@ -103,6 +103,9 @@ import static android.content.Context.MODE_PRIVATE;
 public class CameraUtil {
     private static final String TAG = "Util";
 
+    // To chose samsung camera
+    public static final boolean HAS_EXYNOS5CAMERA = android.os.SystemProperties.getBoolean("persist.snap.exynos5camera", false);
+
     // For calculate the best fps range for still image capture.
     private final static int MAX_PREVIEW_FPS_TIMES_1000 = 400000;
     private final static int PREFERRED_PREVIEW_FPS_TIMES_1000 = 30000;
@@ -152,6 +155,7 @@ public class CameraUtil {
     // Fields for the show-on-maps-functionality
     private static final String MAPS_PACKAGE_NAME = "com.google.android.apps.maps";
     private static final String MAPS_CLASS_NAME = "com.google.android.maps.MapsActivity";
+
 
     /** Has to be in sync with the receiving MovieActivity. */
     public static final String KEY_TREAT_UP_AS_BACK = "treat-up-as-back";

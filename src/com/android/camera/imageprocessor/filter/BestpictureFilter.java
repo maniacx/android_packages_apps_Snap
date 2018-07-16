@@ -49,6 +49,7 @@ import com.android.camera.CameraActivity;
 import com.android.camera.CaptureModule;
 import com.android.camera.MediaSaveService;
 import com.android.camera.PhotoModule;
+import com.android.camera.SPhotoModule;
 import com.android.camera.imageprocessor.PostProcessor;
 import com.android.camera.util.CameraUtil;
 
@@ -78,6 +79,7 @@ public class BestpictureFilter implements ImageFilter {
     private final static int TIME_DELAY = 50;
     private int mSavedCount = 0;
     private PhotoModule.NamedImages mNamedImages;
+    private SPhotoModule.SNamedImages mSNamedImages;
     private ByteBuffer mBY;
     private ByteBuffer mBVU;
     private Object mClosingLock = new Object();
@@ -96,7 +98,11 @@ public class BestpictureFilter implements ImageFilter {
         mModule = module;
         mActivity = activity;
         mProcessor = processor;
-        mNamedImages = new PhotoModule.NamedImages();
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            mSNamedImages = new SPhotoModule.SNamedImages();
+        } else {
+            mNamedImages = new PhotoModule.NamedImages();
+        }
     }
 
     @Override
@@ -150,38 +156,73 @@ public class BestpictureFilter implements ImageFilter {
 
             byte[] bytes = getYUVBytes(bY, bVU, imageNum);
             long captureStartTime = System.currentTimeMillis();
-            mNamedImages.nameNewImage(captureStartTime);
-            PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
-            String title = (name == null) ? null : name.title;
-            long date = (name == null) ? -1 : name.date;
-            mActivity.getMediaSaveService().addImage(
-                    bytes, title, date, null, mWidth, mHeight,
-                    mOrientation, null, new MediaSaveService.OnMediaSavedListener() {
-                        @Override
-                        public void onMediaSaved(final  Uri uri) {
-                            if (uri != null) {
-                                mActivity.notifyNewMedia(uri);
-                                new Thread() {
-                                    public void run() {
-                                        while(mSavedCount < NUM_REQUIRED_IMAGE) {
-                                            try {
-                                                Thread.sleep(10);
-                                            } catch (Exception e) {
+            if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                mSNamedImages.nameNewImage(captureStartTime);
+                SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                long date = (name == null) ? -1 : name.date;
+                mActivity.getMediaSaveService().addImage(
+                        bytes, title, date, null, mWidth, mHeight,
+                        mOrientation, null, new MediaSaveService.OnMediaSavedListener() {
+                            @Override
+                            public void onMediaSaved(final  Uri uri) {
+                                if (uri != null) {
+                                    mActivity.notifyNewMedia(uri);
+                                    new Thread() {
+                                        public void run() {
+                                            while(mSavedCount < NUM_REQUIRED_IMAGE) {
+                                                try {
+                                                    Thread.sleep(10);
+                                                } catch (Exception e) {
+                                                }
                                             }
+                                            mActivity.runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    dismissProgressDialog();
+                                                    startBestpictureActivity(uri);
+                                                }
+                                            });
                                         }
-                                        mActivity.runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                dismissProgressDialog();
-                                                startBestpictureActivity(uri);
-                                            }
-                                        });
-                                    }
-                                }.start();
-
+                                    }.start();
+    
+                                }
                             }
                         }
-                    }
-                    , mActivity.getContentResolver(), "jpeg");
+                        , mActivity.getContentResolver(), "jpeg");
+            } else {
+                mNamedImages.nameNewImage(captureStartTime);
+                PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                long date = (name == null) ? -1 : name.date;
+                mActivity.getMediaSaveService().addImage(
+                        bytes, title, date, null, mWidth, mHeight,
+                        mOrientation, null, new MediaSaveService.OnMediaSavedListener() {
+                            @Override
+                            public void onMediaSaved(final  Uri uri) {
+                                if (uri != null) {
+                                    mActivity.notifyNewMedia(uri);
+                                    new Thread() {
+                                        public void run() {
+                                            while(mSavedCount < NUM_REQUIRED_IMAGE) {
+                                                try {
+                                                    Thread.sleep(10);
+                                                } catch (Exception e) {
+                                                }
+                                            }
+                                            mActivity.runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    dismissProgressDialog();
+                                                    startBestpictureActivity(uri);
+                                                }
+                                            });
+                                        }
+                                    }.start();
+    
+                                }
+                            }
+                        }
+                        , mActivity.getContentResolver(), "jpeg");
+            }
         }
         byte[] bytes = getYUVBytes(bY, bVU, imageNum);
         saveBestPicture(bytes, imageNum);

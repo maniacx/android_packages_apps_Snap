@@ -39,6 +39,8 @@ import android.widget.Scroller;
 
 import com.android.camera.PhotoMenu;
 import com.android.camera.VideoMenu;
+import com.android.camera.SPhotoMenu;
+import com.android.camera.SVideoMenu;
 import com.android.camera.PreviewGestures;
 import com.android.camera.CameraActivity;
 import com.android.camera.data.LocalData;
@@ -1829,41 +1831,80 @@ public class FilmStripView extends ViewGroup implements BottomControlsListener {
     public boolean checkSendToModeView(MotionEvent ev) {
         if (mSendToPreviewMenu || mSendToMenu || mPreviewGestures == null)
             return true;
-        PhotoMenu pMenu = mPreviewGestures.getPhotoMenu();
-        VideoMenu vMenu = mPreviewGestures.getVideoMenu();
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            SPhotoMenu pMenu = mPreviewGestures.getSPhotoMenu();
+            SVideoMenu vMenu = mPreviewGestures.getSVideoMenu();
+            if (pMenu != null) {
+                if (pMenu.isMenuBeingShown()) {
+                    if (pMenu.isMenuBeingAnimated()) {
+                        if (pMenu.isOverMenu(ev)) {
+                            mSendToMenu = true;
+                            return true;
+                        }
+                    }
+                }
 
-        if (pMenu != null) {
-            if (pMenu.isMenuBeingShown()) {
-                if (pMenu.isMenuBeingAnimated()) {
-                    if (pMenu.isOverMenu(ev)) {
-                        mSendToMenu = true;
+                if (pMenu.isPreviewMenuBeingShown()) {
+                    if (pMenu.isOverPreviewMenu(ev)) {
+                        mSendToPreviewMenu = true;
                         return true;
                     }
                 }
             }
 
-            if (pMenu.isPreviewMenuBeingShown()) {
-                if (pMenu.isOverPreviewMenu(ev)) {
-                    mSendToPreviewMenu = true;
-                    return true;
+            if (vMenu != null) {
+                if (vMenu.isMenuBeingShown()) {
+                    if (vMenu.isMenuBeingAnimated()) {
+                        if (vMenu.isOverMenu(ev)) {
+                            mSendToMenu = true;
+                            return true;
+                        }
+                    }
+                }
+
+                if (vMenu.isPreviewMenuBeingShown()) {
+                    if (vMenu.isOverPreviewMenu(ev)) {
+                        mSendToPreviewMenu = true;
+                        return true;
+                    }
                 }
             }
-        }
+        } else {
+            PhotoMenu pMenu = mPreviewGestures.getPhotoMenu();
+            VideoMenu vMenu = mPreviewGestures.getVideoMenu();
+            if (pMenu != null) {
+                if (pMenu.isMenuBeingShown()) {
+                    if (pMenu.isMenuBeingAnimated()) {
+                        if (pMenu.isOverMenu(ev)) {
+                            mSendToMenu = true;
+                            return true;
+                        }
+                    }
+                }
 
-        if (vMenu != null) {
-            if (vMenu.isMenuBeingShown()) {
-                if (vMenu.isMenuBeingAnimated()) {
-                    if (vMenu.isOverMenu(ev)) {
-                        mSendToMenu = true;
+                if (pMenu.isPreviewMenuBeingShown()) {
+                    if (pMenu.isOverPreviewMenu(ev)) {
+                        mSendToPreviewMenu = true;
                         return true;
                     }
                 }
             }
 
-            if (vMenu.isPreviewMenuBeingShown()) {
-                if (vMenu.isOverPreviewMenu(ev)) {
-                    mSendToPreviewMenu = true;
-                    return true;
+            if (vMenu != null) {
+                if (vMenu.isMenuBeingShown()) {
+                    if (vMenu.isMenuBeingAnimated()) {
+                        if (vMenu.isOverMenu(ev)) {
+                            mSendToMenu = true;
+                            return true;
+                        }
+                    }
+                }
+
+                if (vMenu.isPreviewMenuBeingShown()) {
+                    if (vMenu.isOverPreviewMenu(ev)) {
+                        mSendToPreviewMenu = true;
+                        return true;
+                    }
                 }
             }
         }
@@ -1884,33 +1925,63 @@ public class FilmStripView extends ViewGroup implements BottomControlsListener {
                     || MotionEvent.ACTION_CANCEL == ev.getActionMasked())
                 mReset = true;
         }
-        PhotoMenu pMenu = mPreviewGestures.getPhotoMenu();
-        VideoMenu vMenu = mPreviewGestures.getVideoMenu();
-        if (pMenu != null) {
-            if (mSendToPreviewMenu)
-                return pMenu.sendTouchToPreviewMenu(ev);
-            if (mSendToMenu)
-                return pMenu.sendTouchToMenu(ev);
-            if (pMenu.isMenuBeingShown()) {
-                return pMenu.sendTouchToMenu(ev);
-            }
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            SPhotoMenu pMenu = mPreviewGestures.getSPhotoMenu();
+            SVideoMenu vMenu = mPreviewGestures.getSVideoMenu();
+            if (pMenu != null) {
+                if (mSendToPreviewMenu)
+                    return pMenu.sendTouchToPreviewMenu(ev);
+                if (mSendToMenu)
+                    return pMenu.sendTouchToMenu(ev);
+                if (pMenu.isMenuBeingShown()) {
+                    return pMenu.sendTouchToMenu(ev);
+                }
 
-            if (pMenu.isPreviewMenuBeingShown()) {
-                return pMenu.sendTouchToPreviewMenu(ev);
+                if (pMenu.isPreviewMenuBeingShown()) {
+                    return pMenu.sendTouchToPreviewMenu(ev);
+                }
             }
-        }
+            if (vMenu != null) {
+                if (mSendToPreviewMenu)
+                    return vMenu.sendTouchToPreviewMenu(ev);
+                if (mSendToMenu)
+                    return vMenu.sendTouchToMenu(ev);
+                if (vMenu.isMenuBeingShown()) {
+                    return vMenu.sendTouchToMenu(ev);
+                }
 
-        if (vMenu != null) {
-            if (mSendToPreviewMenu)
-                return vMenu.sendTouchToPreviewMenu(ev);
-            if (mSendToMenu)
-                return vMenu.sendTouchToMenu(ev);
-            if (vMenu.isMenuBeingShown()) {
-                return vMenu.sendTouchToMenu(ev);
+                if (vMenu.isPreviewMenuBeingShown()) {
+                    return vMenu.sendTouchToPreviewMenu(ev);
+                }
             }
+        } else {
+            PhotoMenu pMenu = mPreviewGestures.getPhotoMenu();
+            VideoMenu vMenu = mPreviewGestures.getVideoMenu();
+            if (pMenu != null) {
+                if (mSendToPreviewMenu)
+                    return pMenu.sendTouchToPreviewMenu(ev);
+                if (mSendToMenu)
+                    return pMenu.sendTouchToMenu(ev);
+                if (pMenu.isMenuBeingShown()) {
+                    return pMenu.sendTouchToMenu(ev);
+                }
 
-            if (vMenu.isPreviewMenuBeingShown()) {
-                return vMenu.sendTouchToPreviewMenu(ev);
+                if (pMenu.isPreviewMenuBeingShown()) {
+                    return pMenu.sendTouchToPreviewMenu(ev);
+                }
+            }
+            if (vMenu != null) {
+                if (mSendToPreviewMenu)
+                    return vMenu.sendTouchToPreviewMenu(ev);
+                if (mSendToMenu)
+                    return vMenu.sendTouchToMenu(ev);
+                if (vMenu.isMenuBeingShown()) {
+                    return vMenu.sendTouchToMenu(ev);
+                }
+
+                if (vMenu.isPreviewMenuBeingShown()) {
+                    return vMenu.sendTouchToPreviewMenu(ev);
+                }
             }
         }
         return false;

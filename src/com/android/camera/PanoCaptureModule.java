@@ -470,7 +470,8 @@ public class PanoCaptureModule implements CameraModule, PhotoController {
             String filename = PanoUtil.createName(
                     mActivity.getResources().getString(R.string.pano_file_name_format), timeTaken);
             String filepath = Storage.generateFilepath(filename,
-                    PhotoModule.PIXEL_FORMAT_JPEG);
+                    CameraUtil.HAS_EXYNOS5CAMERA ? SPhotoModule.PIXEL_FORMAT_JPEG
+                         :PhotoModule.PIXEL_FORMAT_JPEG);
 
             Location loc = mLocationManager.getCurrentLocation();
             ExifInterface exif = new ExifInterface();

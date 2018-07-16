@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.android.camera.PhotoUI;
+import com.android.camera.SPhotoUI;
 import com.android.camera.util.CameraUtil;
 import com.android.camera.util.PersistUtil;
 import org.codeaurora.snapcam.R;
@@ -39,7 +40,8 @@ import org.codeaurora.snapcam.wrapper.ExtendedFaceWrapper;
 
 public class FaceView extends View
     implements FocusIndicator, Rotatable,
-    PhotoUI.SurfaceTextureSizeChangedListener {
+    PhotoUI.SurfaceTextureSizeChangedListener,
+    SPhotoUI.SurfaceTextureSizeChangedListener {
     protected static final String TAG = "CAM_FaceView";
     protected final boolean LOGV =
             (PersistUtil.getCamera2Debug() == PersistUtil.CAMERA2_DEBUG_DUMP_LOG) ||

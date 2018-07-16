@@ -58,6 +58,7 @@ import com.android.camera.CaptureModule;
 import com.android.camera.Exif;
 import com.android.camera.MediaSaveService;
 import com.android.camera.PhotoModule;
+import com.android.camera.SPhotoModule;
 import com.android.camera.SettingsManager;
 import com.android.camera.exif.ExifInterface;
 import com.android.camera.exif.Rational;
@@ -116,6 +117,7 @@ public class PostProcessor{
     private ImageFilter.ResultImage mDefaultResultImage;  //This is used only no filter is chosen.
     private Image[] mImages;
     private PhotoModule.NamedImages mNamedImages;
+    private SPhotoModule.SNamedImages mSNamedImages;
     private WatchdogThread mWatchdog;
     private int mOrientation = 0;
     private ImageWriter mImageWriter;
@@ -598,11 +600,21 @@ public class PostProcessor{
         if (isReadyToProcess()) {
             mController.unlockFocus(mController.getMainCameraId());
             long captureStartTime = System.currentTimeMillis();
-            mNamedImages.nameNewImage(captureStartTime);
-            PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
-            String title = (name == null) ? null : name.title;
-            long date = (name == null) ? -1 : name.date;
-            processImage(title, date, mController.getMediaSavedListener(), mActivity.getContentResolver());
+            if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                mSNamedImages.nameNewImage(captureStartTime);
+                SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                long date = (name == null) ? -1 : name.date;
+                processImage(title, date, mController.getMediaSavedListener(), mActivity.getContentResolver());
+
+            } else {
+                mNamedImages.nameNewImage(captureStartTime);
+                PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                long date = (name == null) ? -1 : name.date;
+                processImage(title, date, mController.getMediaSavedListener(), mActivity.getContentResolver());
+
+            }
         }
     }
 
@@ -611,10 +623,18 @@ public class PostProcessor{
         byte[] data = new byte[buffer.remaining()];
         buffer.get(data);
         long captureStartTime = System.currentTimeMillis();
-        mNamedImages.nameNewImage(captureStartTime);
-        PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
-        String title = (name == null) ? null : name.title;
-        mActivity.getMediaSaveService().addRawImage(data, title, "raw");
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            mSNamedImages.nameNewImage(captureStartTime);
+            SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
+            String title = (name == null) ? null : name.title;
+            mActivity.getMediaSaveService().addRawImage(data, title, "raw");
+
+        } else {
+            mNamedImages.nameNewImage(captureStartTime);
+            PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+            String title = (name == null) ? null : name.title;
+            mActivity.getMediaSaveService().addRawImage(data, title, "raw");
+        }
     }
 
     enum STATUS {
@@ -628,7 +648,11 @@ public class PostProcessor{
         mController = module;
         mActivity = activity;
         checkAndEnableZSL(mController.getMainCameraId());
-        mNamedImages = new PhotoModule.NamedImages();
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            mSNamedImages = new SPhotoModule.SNamedImages();
+        } else {
+            mNamedImages = new PhotoModule.NamedImages();
+        }
     }
 
     public boolean isItBusy() {
@@ -1176,29 +1200,56 @@ public class PostProcessor{
             mSavingHander.post(new Runnable() {
                 public void run() {
                     long captureStartTime = System.currentTimeMillis();
-                    mNamedImages.nameNewImage(captureStartTime);
-                    PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
-                    String title = (name == null) ? null : name.title;
-                    long date = (name == null) ? -1 : name.date;
-                    image.getPlanes()[0].getBuffer().rewind();
-                    int size = image.getPlanes()[0].getBuffer().remaining();
-                    byte[] bytes = new byte[size];
-                    image.getPlanes()[0].getBuffer().get(bytes, 0, size);
-                    ExifInterface exif = Exif.getExif(bytes);
-                    int orientation = Exif.getOrientation(exif);
-                    if (mController.getCurrentIntentMode() != CaptureModule.INTENT_MODE_NORMAL) {
-                        mController.setJpegImageData(bytes);
-                        if (mController.isQuickCapture()) {
-                            mController.onCaptureDone();
+                    if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                        mSNamedImages.nameNewImage(captureStartTime);
+                        SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
+                        String title = (name == null) ? null : name.title;
+                        long date = (name == null) ? -1 : name.date;
+                        image.getPlanes()[0].getBuffer().rewind();
+                        int size = image.getPlanes()[0].getBuffer().remaining();
+                        byte[] bytes = new byte[size];
+                        image.getPlanes()[0].getBuffer().get(bytes, 0, size);
+                        ExifInterface exif = Exif.getExif(bytes);
+                        int orientation = Exif.getOrientation(exif);
+                        if (mController.getCurrentIntentMode() != CaptureModule.INTENT_MODE_NORMAL) {
+                            mController.setJpegImageData(bytes);
+                            if (mController.isQuickCapture()) {
+                                mController.onCaptureDone();
+                            } else {
+                                mController.showCapturedReview(bytes, orientation);
+                            }
                         } else {
-                            mController.showCapturedReview(bytes, orientation);
+                            mActivity.getMediaSaveService().addImage(
+                                    bytes, title, date, null, image.getCropRect().width(), image.getCropRect().height(),
+                                    orientation, null, mController.getMediaSavedListener(), mActivity.getContentResolver(), "jpeg");
+                            mController.updateThumbnailJpegData(bytes);
+                            image.close();
                         }
                     } else {
-                        mActivity.getMediaSaveService().addImage(
-                                bytes, title, date, null, image.getCropRect().width(), image.getCropRect().height(),
-                                orientation, null, mController.getMediaSavedListener(), mActivity.getContentResolver(), "jpeg");
-                        mController.updateThumbnailJpegData(bytes);
-                        image.close();
+                        mNamedImages.nameNewImage(captureStartTime);
+                        PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+                        String title = (name == null) ? null : name.title;
+                        long date = (name == null) ? -1 : name.date;
+                        image.getPlanes()[0].getBuffer().rewind();
+                        int size = image.getPlanes()[0].getBuffer().remaining();
+                        byte[] bytes = new byte[size];
+                        image.getPlanes()[0].getBuffer().get(bytes, 0, size);
+                        ExifInterface exif = Exif.getExif(bytes);
+                        int orientation = Exif.getOrientation(exif);
+                        if (mController.getCurrentIntentMode() != CaptureModule.INTENT_MODE_NORMAL) {
+                            mController.setJpegImageData(bytes);
+                            if (mController.isQuickCapture()) {
+                                mController.onCaptureDone();
+                            } else {
+                                mController.showCapturedReview(bytes, orientation);
+                            }
+                        } else {
+                            mActivity.getMediaSaveService().addImage(
+                                    bytes, title, date, null, image.getCropRect().width(), image.getCropRect().height(),
+                                    orientation, null, mController.getMediaSavedListener(), mActivity.getContentResolver(), "jpeg");
+                            mController.updateThumbnailJpegData(bytes);
+                            image.close();
+                        }
                     }
                 }
             });

@@ -48,8 +48,10 @@ public class ModuleSwitcher extends RotateImageView
     private static final String TAG = "CAM_Switcher";
     private static final int SWITCHER_POPUP_ANIM_DURATION = 200;
 
-    public static final int PHOTO_MODULE_INDEX = 0;
-    public static final int VIDEO_MODULE_INDEX = 1;
+    public static final int PHOTO_MODULE_INDEX = 9;
+    public static final int VIDEO_MODULE_INDEX = 8;
+    public static final int SPHOTO_MODULE_INDEX = 0;
+    public static final int SVIDEO_MODULE_INDEX = 1;
     public static final int WIDE_ANGLE_PANO_MODULE_INDEX = 2;
     public static final int QR_MODULE_INDEX = 3;
     public static final int LIGHTCYCLE_MODULE_INDEX = 4;
@@ -118,10 +120,21 @@ public class ModuleSwitcher extends RotateImageView
         // Always decrement one because of GCam.
         --numDrawIds;
 
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            --numDrawIds;
+        }
+
         int[] drawids = new int[numDrawIds];
         int[] moduleids = new int[numDrawIds];
         int ix = 0;
         for (int i = 0; i < DRAW_IDS.length; i++) {
+            if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                if(i == PHOTO_MODULE_INDEX || i == VIDEO_MODULE_INDEX || i == QR_MODULE_INDEX)
+                     continue;
+            } else {
+                if(i == SPHOTO_MODULE_INDEX || i == SVIDEO_MODULE_INDEX)
+                     continue;
+            }
             if (i == LIGHTCYCLE_MODULE_INDEX && !PhotoSphereHelper.hasLightCycleCapture(context)) {
                 continue; // not enabled, so don't add to UI
             }

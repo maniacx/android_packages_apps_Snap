@@ -43,6 +43,7 @@ import com.android.camera.mpo.MpoImageData;
 import com.android.camera.mpo.MpoInterface;
 import com.android.camera.util.PersistUtil;
 import com.android.camera.util.XmpUtil;
+import com.android.camera.util.CameraUtil;
 
 import org.codeaurora.snapcam.filter.GDepth;
 import org.codeaurora.snapcam.filter.GImage;
@@ -188,13 +189,15 @@ public class MediaSaveService extends Service {
         // When dimensions are unknown, pass 0 as width and height,
         // and decode image for width and height later in a background thread
         addImage(data, title, date, loc, 0, 0, orientation, exif, l, resolver,
-                 PhotoModule.PIXEL_FORMAT_JPEG);
+                 CameraUtil.HAS_EXYNOS5CAMERA ? SPhotoModule.PIXEL_FORMAT_JPEG
+                         :PhotoModule.PIXEL_FORMAT_JPEG);
     }
     public void addImage(final byte[] data, String title, Location loc,
             int width, int height, int orientation, ExifInterface exif,
             OnMediaSavedListener l, ContentResolver resolver) {
         addImage(data, title, System.currentTimeMillis(), loc, width, height,
-                orientation, exif, l, resolver,PhotoModule.PIXEL_FORMAT_JPEG);
+                orientation, exif, l, resolver,CameraUtil.HAS_EXYNOS5CAMERA ? 
+                SPhotoModule.PIXEL_FORMAT_JPEG : PhotoModule.PIXEL_FORMAT_JPEG);
     }
 
     public void addVideo(String path, long duration, ContentValues values,

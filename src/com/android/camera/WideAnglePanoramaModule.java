@@ -45,6 +45,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 import com.android.camera.PhotoModule;
+import com.android.camera.SPhotoModule;
 import com.android.camera.CameraManager.CameraProxy;
 import com.android.camera.app.OrientationManager;
 import com.android.camera.data.LocalData;
@@ -863,7 +864,8 @@ public class WideAnglePanoramaModule
             String filename = PanoUtil.createName(
                     mActivity.getResources().getString(R.string.pano_file_name_format), mTimeTaken);
             String filepath = Storage.generateFilepath(filename,
-                              PhotoModule.PIXEL_FORMAT_JPEG);
+                              CameraUtil.HAS_EXYNOS5CAMERA ? SPhotoModule.PIXEL_FORMAT_JPEG
+                              :PhotoModule.PIXEL_FORMAT_JPEG);
 
             UsageStatistics.onEvent(UsageStatistics.COMPONENT_PANORAMA,
                     UsageStatistics.ACTION_CAPTURE_DONE, null, 0,

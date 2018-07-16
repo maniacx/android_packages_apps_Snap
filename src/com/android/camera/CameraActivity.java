@@ -209,6 +209,8 @@ public class CameraActivity extends Activity
     private CameraModule mCurrentModule;
     private PhotoModule mPhotoModule;
     private VideoModule mVideoModule;
+    private SPhotoModule mSPhotoModule;
+    private SVideoModule mSVideoModule;
     private WideAnglePanoramaModule mPanoModule;
     private CaptureModule mCaptureModule;
     private PanoCaptureModule mPano2Module;
@@ -818,7 +820,7 @@ public class CameraActivity extends Activity
     public void updateThumbnail(boolean videoOnly) {
         // Only handle OnDataInserted if it's video.
         // Photo and Panorama have their own way of updating thumbnail.
-        if (!videoOnly || (mCurrentModule instanceof VideoModule) ||
+        if (!videoOnly || (mCurrentModule instanceof VideoModule) || (mCurrentModule instanceof SVideoModule) ||
                 ((mCurrentModule instanceof CaptureModule) && videoOnly)) {
             (new UpdateThumbnailTask(null, true)).execute();
         }
@@ -1545,11 +1547,13 @@ public class CameraActivity extends Activity
         int moduleIndex = -1;
         if (MediaStore.INTENT_ACTION_VIDEO_CAMERA.equals(getIntent().getAction())
                 || MediaStore.ACTION_VIDEO_CAPTURE.equals(getIntent().getAction())) {
-            moduleIndex = ModuleSwitcher.VIDEO_MODULE_INDEX;
+            moduleIndex = CameraUtil.HAS_EXYNOS5CAMERA ? ModuleSwitcher.SVIDEO_MODULE_INDEX
+                            : ModuleSwitcher.VIDEO_MODULE_INDEX;
         } else if (MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA.equals(getIntent().getAction())
                 || MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE.equals(getIntent()
                 .getAction())) {
-            moduleIndex = ModuleSwitcher.PHOTO_MODULE_INDEX;
+            moduleIndex = CameraUtil.HAS_EXYNOS5CAMERA ? ModuleSwitcher.SPHOTO_MODULE_INDEX
+                            : ModuleSwitcher.PHOTO_MODULE_INDEX;
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             if (prefs.getInt(CameraSettings.KEY_STARTUP_MODULE_INDEX, -1)
                     == ModuleSwitcher.GCAM_MODULE_INDEX && GcamHelper.hasGcamCapture()) {
@@ -1557,7 +1561,8 @@ public class CameraActivity extends Activity
             }
         } else if (MediaStore.ACTION_IMAGE_CAPTURE.equals(getIntent().getAction())
                 || MediaStore.ACTION_IMAGE_CAPTURE_SECURE.equals(getIntent().getAction())) {
-            moduleIndex = ModuleSwitcher.PHOTO_MODULE_INDEX;
+            moduleIndex = CameraUtil.HAS_EXYNOS5CAMERA ? ModuleSwitcher.SPHOTO_MODULE_INDEX
+                            : ModuleSwitcher.PHOTO_MODULE_INDEX;
         } else {
             // If the activity has not been started using an explicit intent,
             // read the module index from the last time the user changed modes
@@ -1565,7 +1570,8 @@ public class CameraActivity extends Activity
             moduleIndex = prefs.getInt(CameraSettings.KEY_STARTUP_MODULE_INDEX, -1);
             if ((moduleIndex == ModuleSwitcher.GCAM_MODULE_INDEX &&
                     !GcamHelper.hasGcamCapture()) || moduleIndex < 0) {
-                moduleIndex = ModuleSwitcher.PHOTO_MODULE_INDEX;
+            moduleIndex = CameraUtil.HAS_EXYNOS5CAMERA ? ModuleSwitcher.SPHOTO_MODULE_INDEX
+                            : ModuleSwitcher.PHOTO_MODULE_INDEX;
             }
         }
 
@@ -2198,6 +2204,17 @@ public class CameraActivity extends Activity
                 mCameraVideoModuleRootView.setVisibility(View.VISIBLE);
                 break;
 
+            case ModuleSwitcher.SVIDEO_MODULE_INDEX:
+                if(mSVideoModule == null) {
+                    mSVideoModule = new SVideoModule();
+                    mSVideoModule.init(this, mCameraVideoModuleRootView);
+                } else {
+                    mSVideoModule.reinit();
+                }
+                mCurrentModule = mSVideoModule;
+                mCameraVideoModuleRootView.setVisibility(View.VISIBLE);
+                break;
+
             case ModuleSwitcher.PHOTO_MODULE_INDEX:
                 if(mPhotoModule == null) {
                     mPhotoModule = new PhotoModule();
@@ -2206,6 +2223,17 @@ public class CameraActivity extends Activity
                     mPhotoModule.reinit();
                 }
                 mCurrentModule = mPhotoModule;
+                mCameraPhotoModuleRootView.setVisibility(View.VISIBLE);
+                break;
+
+            case ModuleSwitcher.SPHOTO_MODULE_INDEX:
+                if(mSPhotoModule == null) {
+                    mSPhotoModule = new SPhotoModule();
+                    mSPhotoModule.init(this, mCameraPhotoModuleRootView);
+                } else {
+                    mSPhotoModule.reinit();
+                }
+                mCurrentModule = mSPhotoModule;
                 mCameraPhotoModuleRootView.setVisibility(View.VISIBLE);
                 break;
 
@@ -2237,7 +2265,8 @@ public class CameraActivity extends Activity
                             RotateTextToast.makeText(activity, "Panocapture library is missing", Toast.LENGTH_SHORT).show();
                         }
                     });
-                    mCurrentModuleIndex = ModuleSwitcher.PHOTO_MODULE_INDEX;
+                    mCurrentModuleIndex = CameraUtil.HAS_EXYNOS5CAMERA ? ModuleSwitcher.SPHOTO_MODULE_INDEX
+                            : ModuleSwitcher.PHOTO_MODULE_INDEX;
                     //Let it fall through to photo module
                 } else {
                     if (mPano2Module == null) {
@@ -2252,14 +2281,25 @@ public class CameraActivity extends Activity
             case ModuleSwitcher.GCAM_MODULE_INDEX:  //Unused module for now
             default:
                 // Fall back to photo mode.
-                if(mPhotoModule == null) {
-                    mPhotoModule = new PhotoModule();
-                    mPhotoModule.init(this, mCameraPhotoModuleRootView);
+                if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                    if(mSPhotoModule == null) {
+                        mSPhotoModule = new SPhotoModule();
+                        mSPhotoModule.init(this, mCameraPhotoModuleRootView);
+                    } else {
+                        mSPhotoModule.reinit();
+                    }
+                    mCurrentModule = mSPhotoModule;
+                    mCameraPhotoModuleRootView.setVisibility(View.VISIBLE);
                 } else {
-                    mPhotoModule.reinit();
+                    if(mPhotoModule == null) {
+                        mPhotoModule = new PhotoModule();
+                        mPhotoModule.init(this, mCameraPhotoModuleRootView);
+                    } else {
+                        mPhotoModule.reinit();
+                    }
+                    mCurrentModule = mPhotoModule;
+                    mCameraPhotoModuleRootView.setVisibility(View.VISIBLE);
                 }
-                mCurrentModule = mPhotoModule;
-                mCameraPhotoModuleRootView.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -2444,38 +2484,73 @@ public class CameraActivity extends Activity
 
     // Accessor methods for getting latency times used in performance testing
     public long getAutoFocusTime() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mAutoFocusTime : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof SPhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mAutoFocusTime : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mAutoFocusTime : -1;
+        }
     }
 
     public long getShutterLag() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mShutterLag : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof SPhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mShutterLag : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mShutterLag : -1;
+        }
     }
 
     public long getShutterToPictureDisplayedTime() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mShutterToPictureDisplayedTime : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof SPhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mShutterToPictureDisplayedTime : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mShutterToPictureDisplayedTime : -1;
+        }
     }
 
     public long getPictureDisplayedToJpegCallbackTime() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mPictureDisplayedToJpegCallbackTime : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof SPhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mPictureDisplayedToJpegCallbackTime : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mPictureDisplayedToJpegCallbackTime : -1;
+        }
     }
 
     public long getJpegCallbackFinishTime() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mJpegCallbackFinishTime : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mJpegCallbackFinishTime : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((PhotoModule) mCurrentModule).mJpegCallbackFinishTime : -1;
+        }
     }
 
     public long getCaptureStartTime() {
-        return (mCurrentModule instanceof PhotoModule) ?
-                ((PhotoModule) mCurrentModule).mCaptureStartTime : -1;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mCaptureStartTime : -1;
+        } else {
+            return (mCurrentModule instanceof PhotoModule) ?
+                    ((SPhotoModule) mCurrentModule).mCaptureStartTime : -1;
+        }
     }
 
     public boolean isRecording() {
-        return (mCurrentModule instanceof VideoModule) ?
-                ((VideoModule) mCurrentModule).isRecording() : false;
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            return (mCurrentModule instanceof SVideoModule) ?
+                    ((SVideoModule) mCurrentModule).isRecording() : false;
+        } else {
+            return (mCurrentModule instanceof VideoModule) ?
+                    ((VideoModule) mCurrentModule).isRecording() : false;
+        }
     }
 
     public CameraOpenErrorCallback getCameraOpenErrorCallback() {

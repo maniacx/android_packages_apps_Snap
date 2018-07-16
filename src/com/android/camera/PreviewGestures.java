@@ -59,6 +59,8 @@ public class PreviewGestures
     private CaptureUI mCaptureUI;
     private PhotoMenu mPhotoMenu;
     private VideoMenu mVideoMenu;
+    private SPhotoMenu mSPhotoMenu;
+    private SVideoMenu mSVideoMenu;
     private boolean waitUntilNextDown;
     private boolean setToFalse;
 
@@ -98,6 +100,10 @@ public class PreviewGestures
                 orientation = mVideoMenu.getOrientation();
             else if (mCaptureUI != null)
                 orientation = mCaptureUI.getOrientation();
+            else if (mSPhotoMenu != null)
+                orientation = mSPhotoMenu.getOrientation();
+            else if (mSVideoMenu != null)
+                orientation = mSVideoMenu.getOrientation();
 
             if (isLeftSwipe(orientation, deltaX, deltaY)) {
                 waitUntilNextDown = true;
@@ -107,6 +113,10 @@ public class PreviewGestures
                     mVideoMenu.openFirstLevel();
                 else if (mCaptureUI != null)
                     mCaptureUI.openSettingsMenu();
+                else if (mSPhotoMenu != null && !mSPhotoMenu.isMenuBeingShown())
+                    mSPhotoMenu.openFirstLevel();
+                else if (mSVideoMenu != null && !mSVideoMenu.isMenuBeingShown())
+                    mSVideoMenu.openFirstLevel();
                 return true;
             }
 
@@ -183,6 +193,22 @@ public class PreviewGestures
         return mVideoMenu;
     }
 
+    public void setSPhotoMenu(SPhotoMenu menu) {
+        mSPhotoMenu = menu;
+    }
+
+    public void setSVideoMenu(SVideoMenu menu) {
+        mSVideoMenu = menu;
+    }
+
+    public SPhotoMenu getSPhotoMenu() {
+        return mSPhotoMenu;
+    }
+
+    public SVideoMenu getSVideoMenu() {
+        return mSVideoMenu;
+    }
+
     public boolean dispatchTouch(MotionEvent m) {
         if (setToFalse) {
             waitUntilNextDown = false;
@@ -250,6 +276,37 @@ public class PreviewGestures
             if (mVideoMenu.isPreviewMenuBeingShown()) {
                 waitUntilNextDown = true;
                 mVideoMenu.animateSlideOutPreviewMenu();
+                return true;
+            }
+        }
+
+        if (mSPhotoMenu != null) {
+            if (mSPhotoMenu.isMenuBeingShown()) {
+                if (!mSPhotoMenu.isMenuBeingAnimated()) {
+                    waitUntilNextDown = true;
+                    mSPhotoMenu.closeView();
+                }
+                return true;
+            }
+            if (mSPhotoMenu.isPreviewMenuBeingShown()) {
+                waitUntilNextDown = true;
+                mSPhotoMenu.animateSlideOutPreviewMenu();
+                return true;
+            }
+        }
+
+        if (mSVideoMenu != null) {
+            if (mSVideoMenu.isMenuBeingShown()) {
+                if (!mSVideoMenu.isMenuBeingAnimated()) {
+                    waitUntilNextDown = true;
+                    mSVideoMenu.closeView();
+                }
+                return true;
+            }
+
+            if (mSVideoMenu.isPreviewMenuBeingShown()) {
+                waitUntilNextDown = true;
+                mSVideoMenu.animateSlideOutPreviewMenu();
                 return true;
             }
         }

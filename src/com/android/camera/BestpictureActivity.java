@@ -98,6 +98,7 @@ public class BestpictureActivity extends FragmentActivity {
     private ImageItems mImageItems;
     private ImageLoadingThread mLoadingThread;
     private PhotoModule.NamedImages mNamedImages;
+    private SPhotoModule.SNamedImages mSNamedImages;
     private Uri mPlaceHolderUri;
     private Dialog mDialog;
     private AlertDialog.Builder mBuilder;
@@ -188,8 +189,11 @@ public class BestpictureActivity extends FragmentActivity {
         display.getSize(size);
         mWidth = size.x/4;
         mHeight = size.y/4;
-        mNamedImages = new PhotoModule.NamedImages();
-
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            mSNamedImages = new SPhotoModule.SNamedImages();
+        } else {
+            mNamedImages = new PhotoModule.NamedImages();
+        }
         mImageItems = new ImageItems(mActivity);
         mDotsView = (DotsView) findViewById(R.id.dots_view);
         mDotsView.setItems(mImageItems);
@@ -613,34 +617,14 @@ public class BestpictureActivity extends FragmentActivity {
 
     private void saveForground(String path) {
         long captureStartTime = System.currentTimeMillis();
-        mNamedImages.nameNewImage(captureStartTime);
-        PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
-        String title = (name == null) ? null : name.title;
-        String outPath = mPlaceHolderUri.getPath();
-        try {
-            FileOutputStream out = new FileOutputStream(outPath);
-            FileInputStream in = new FileInputStream(path);
-            byte[] buf = new byte[4096];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        } catch (Exception e) {
-        }
-    }
-
-    private class SaveImageTask extends AsyncTask<String, Void, Void> {
-        protected Void doInBackground(String... path) {
-            long captureStartTime = System.currentTimeMillis();
-            mNamedImages.nameNewImage(captureStartTime);
-            PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+        if(CameraUtil.HAS_EXYNOS5CAMERA) {
+            mSNamedImages.nameNewImage(captureStartTime);
+            SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
             String title = (name == null) ? null : name.title;
-            String outPath = Storage.generateFilepath(title, "jpeg");
+            String outPath = mPlaceHolderUri.getPath();
             try {
                 FileOutputStream out = new FileOutputStream(outPath);
-                FileInputStream in = new FileInputStream(path[0]);
+                FileInputStream in = new FileInputStream(path);
                 byte[] buf = new byte[4096];
                 int len;
                 while ((len = in.read(buf)) > 0) {
@@ -650,10 +634,72 @@ public class BestpictureActivity extends FragmentActivity {
                 out.close();
             } catch (Exception e) {
             }
-            Uri uri = Uri.fromFile(new File(outPath));
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
-            sendBroadcast(intent);
-            return null;
+        } else {
+            mNamedImages.nameNewImage(captureStartTime);
+            PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+            String title = (name == null) ? null : name.title;
+            String outPath = mPlaceHolderUri.getPath();
+            try {
+                FileOutputStream out = new FileOutputStream(outPath);
+                FileInputStream in = new FileInputStream(path);
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private class SaveImageTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(String... path) {
+            long captureStartTime = System.currentTimeMillis();
+            if(CameraUtil.HAS_EXYNOS5CAMERA) {
+                mSNamedImages.nameNewImage(captureStartTime);
+                SPhotoModule.SNamedImages.SNamedEntity name = mSNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                String outPath = Storage.generateFilepath(title, "jpeg");
+                try {
+                    FileOutputStream out = new FileOutputStream(outPath);
+                    FileInputStream in = new FileInputStream(path[0]);
+                    byte[] buf = new byte[4096];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    in.close();
+                    out.close();
+                } catch (Exception e) {
+                }
+                Uri uri = Uri.fromFile(new File(outPath));
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+                sendBroadcast(intent);
+                return null;
+            } else {
+                mNamedImages.nameNewImage(captureStartTime);
+                PhotoModule.NamedImages.NamedEntity name = mNamedImages.getNextNameEntity();
+                String title = (name == null) ? null : name.title;
+                String outPath = Storage.generateFilepath(title, "jpeg");
+                try {
+                    FileOutputStream out = new FileOutputStream(outPath);
+                    FileInputStream in = new FileInputStream(path[0]);
+                    byte[] buf = new byte[4096];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    in.close();
+                    out.close();
+                } catch (Exception e) {
+                }
+                Uri uri = Uri.fromFile(new File(outPath));
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+                sendBroadcast(intent);
+                return null;
+            }
         }
 
         protected void onPostExecute(Void v) {
