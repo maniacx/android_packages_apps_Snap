@@ -2006,7 +2006,7 @@ public class SPhotoModule
     private void loadCameraPreferences() {
         CameraSettings settings = new CameraSettings(mActivity, mInitialParams,
                 mCameraId, CameraHolder.instance().getCameraInfo());
-        mPreferenceGroup = settings.getPreferenceGroup(R.xml.camera_preferences);
+        mPreferenceGroup = settings.getPreferenceGroup(R.xml.exynos_camera_preferences);
 
         int numOfCams = Camera.getNumberOfCameras();
 

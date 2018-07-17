@@ -703,7 +703,7 @@ public class SVideoModule implements CameraModule,
                 mCameraId, CameraHolder.instance().getCameraInfo());
         // Remove the video quality preference setting when the quality is given in the intent.
         mPreferenceGroup = filterPreferenceScreenByIntent(
-                settings.getPreferenceGroup(R.xml.video_preferences));
+                settings.getPreferenceGroup(R.xml.exynos_video_preferences));
 
         int numOfCams = Camera.getNumberOfCameras();
 
