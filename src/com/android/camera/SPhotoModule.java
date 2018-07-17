@@ -1922,7 +1922,7 @@ public class SPhotoModule
                 if (colorEffect != null & !colorEffect.equals(defaultEffect)) {
                     // Change the colorEffect to default(None effect) when HDR ON.
                     colorEffect = defaultEffect;
-                    mUI.setPreference(CameraSettings.KEY_COLOR_EFFECT, colorEffect);
+                    mUI.setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT, colorEffect);
                     mParameters.setColorEffect(colorEffect);
                     mCameraDevice.setParameters(mParameters);
                     mParameters = mCameraDevice.getParameters();
@@ -2983,12 +2983,10 @@ public class SPhotoModule
 
         // Set color effect parameter.
         String colorEffect = mPreferences.getString(
-                CameraSettings.KEY_COLOR_EFFECT,
+                CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
                 mActivity.getString(R.string.pref_camera_coloreffect_default));
         Log.v(TAG, "Color effect value =" + colorEffect);
-        if (CameraUtil.isSupported(colorEffect, mParameters.getSupportedColorEffects())) {
-            mParameters.setColorEffect(colorEffect);
-        }
+        mParameters.setColorEffect(colorEffect);
 
         //Set Saturation
         String saturationStr = getSaturationSafe();

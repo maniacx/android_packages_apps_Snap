@@ -576,7 +576,6 @@ public class SPhotoMenu extends MenuController
             popup1.setPreferenceEnabled(CameraSettings.KEY_FOCUS_MODE, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_COLOR_EFFECT, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE, false);
         }
 
@@ -600,7 +599,7 @@ public class SPhotoMenu extends MenuController
             popup1.setPreferenceEnabled(CameraSettings.KEY_CAMERA_HDR,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_LONGSHOT,false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_COLOR_EFFECT,false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_PICTURE_SIZE,false);
 
             setPreference(CameraSettings.KEY_SCENE_MODE,
@@ -608,7 +607,7 @@ public class SPhotoMenu extends MenuController
             setPreference(CameraSettings.KEY_CAMERA_HDR,"off");
             setPreference(CameraSettings.KEY_FLASH_MODE, "off");
             setPreference(CameraSettings.KEY_LONGSHOT, "off");
-            setPreference(CameraSettings.KEY_COLOR_EFFECT,"none");
+            setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,"none");
             ListPreference picSize =
                     mPreferenceGroup.findPreference(CameraSettings.KEY_PICTURE_SIZE);
             CharSequence maxSize = picSize.getEntryValues()[0];
@@ -876,7 +875,7 @@ public class SPhotoMenu extends MenuController
     public void initFilterModeButton(View button) {
         button.setVisibility(View.INVISIBLE);
         final IconListPreference pref = (IconListPreference) mPreferenceGroup
-                .findPreference(CameraSettings.KEY_COLOR_EFFECT);
+                .findPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT);
         if (pref == null || pref.getValue() == null)
             return;
         changeFilterModeControlIcon(pref.getValue());
@@ -897,7 +896,7 @@ public class SPhotoMenu extends MenuController
 
     public void addFilterMode() {
         final IconListPreference pref = (IconListPreference) mPreferenceGroup
-                .findPreference(CameraSettings.KEY_COLOR_EFFECT);
+                .findPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT);
         if (pref == null)
             return;
 
@@ -1172,7 +1171,7 @@ public class SPhotoMenu extends MenuController
         }
 
         if (notSame(pref, CameraSettings.KEY_SCENE_MODE, "auto")) {
-            setPreference(CameraSettings.KEY_COLOR_EFFECT,
+            setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
                     mActivity.getString(R.string.pref_camera_coloreffect_default));
         }
 

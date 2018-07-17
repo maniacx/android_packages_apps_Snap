@@ -46,6 +46,7 @@ import org.codeaurora.snapcam.R;
 import org.codeaurora.snapcam.wrapper.CamcorderProfileWrapper;
 import org.codeaurora.snapcam.wrapper.ParametersWrapper;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -294,6 +295,8 @@ public class CameraSettings {
 // Exynos5Camera
     public static final String KEY_EXYNOS_SATURATION = "pref_camera_exy_saturation_key";
     public static final String KEY_EXYNOS_SHARPNESS = "pref_camera_exy_sharpness_key";
+    public static final String KEY_EXYNOS_COLOR_EFFECT = "pref_camera_exy_coloreffect_key";
+    public static final String KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT = "pref_camera_exy_video_coloreffect_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -1842,7 +1845,8 @@ public class CameraSettings {
     private void exynosInitPreferences(PreferenceGroup group){
         ListPreference exynos_saturation = group.findPreference(KEY_EXYNOS_SATURATION);
         ListPreference exynos_sharpness = group.findPreference(KEY_EXYNOS_SHARPNESS);
-
+        ListPreference exynos_colorEffect = group.findPreference(KEY_EXYNOS_COLOR_EFFECT);
+        ListPreference exynos_camcorderColorEffect = group.findPreference(KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT);
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MAX_SATURATION)) {
@@ -1853,6 +1857,18 @@ public class CameraSettings {
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MAX_SATURATION)) {
             removePreference(group, exynos_sharpness.getKey());
+        }
+
+        String[] colormodes = mContext.getResources().getStringArray(R.array.supported_coloreffect);
+        List<String> supportedColorModes = Arrays.asList(colormodes);
+
+        if (exynos_colorEffect != null) {
+            filterUnsupportedOptions(group,
+                    exynos_colorEffect, supportedColorModes);
+        }
+        if (exynos_camcorderColorEffect != null) {
+            filterUnsupportedOptions(group,
+                    exynos_camcorderColorEffect, supportedColorModes);
         }
     }
 }

@@ -2529,12 +2529,10 @@ public class SVideoModule implements CameraModule,
 
         setZoomMenuValue();
         String colorEffect = mPreferences.getString(
-            CameraSettings.KEY_VIDEOCAMERA_COLOR_EFFECT,
+            CameraSettings.KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT,
             mActivity.getString(R.string.pref_camera_coloreffect_default));
         Log.v(TAG, "Color effect value =" + colorEffect);
-        if (isSupported(colorEffect, mParameters.getSupportedColorEffects())) {
-            mParameters.setColorEffect(colorEffect);
-        }
+        mParameters.setColorEffect(colorEffect);
 
         String disMode = mPreferences.getString(
                 CameraSettings.KEY_DIS,
