@@ -28,4 +28,25 @@
         <item>aqua</item>
     </string-array>
 
+    <!-- List supported scenemode values -->
+    <!-- Note: Please do not remove auto or pro-mode -->
+    <string-array name="supported_scenemode">
+        <item>auto</item>
+        <item>pro-mode</item>
+        <item>action</item>
+        <item>portrait</item>
+        <item>landscape</item>
+        <item>night</item>
+        <item>night-portrait</item>
+        <item>theatre</item>
+        <item>beach</item>
+        <item>snow</item>
+        <item>sunset</item>
+        <item>steadyphoto</item>
+        <item>fireworks</item>
+        <item>sports</item>
+        <item>party</item>
+        <item>candlelight</item>
+    </string-array>
+
 </resources>

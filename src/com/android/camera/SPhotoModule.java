@@ -1978,7 +1978,7 @@ public class SPhotoModule
                 mCameraDevice.setMetadataCb(mMetaDataCallback);
             }
             mUI.overrideSettings(CameraSettings.KEY_FLASH_MODE, Parameters.FLASH_MODE_OFF);
-            mUI.overrideSettings(CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_AUTO);
+            mUI.overrideSettings(CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO);
             final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
             final int degree = prefs.getInt(CameraSettings.KEY_BOKEH_BLUR_VALUE,50);
             mUI.getBokehDegreeBar().setProgress(degree);
@@ -3347,7 +3347,7 @@ public class SPhotoModule
             }
         } else {
             mSceneMode = mPreferences.getString(
-                    CameraSettings.KEY_SCENE_MODE,
+                    CameraSettings.KEY_EXYNOS_SCENE_MODE,
                     mActivity.getString(R.string.pref_camera_scenemode_default));
         }
 
@@ -3355,16 +3355,23 @@ public class SPhotoModule
             mSceneMode = Parameters.SCENE_MODE_AUTO;
         }
 
-        if (CameraUtil.isSupported(mSceneMode, mParameters.getSupportedSceneModes())) {
-            if (!mParameters.getSceneMode().equals(mSceneMode)) {
-                mParameters.setSceneMode(mSceneMode);
+        String proMode = mActivity.getString(R.string
+                .pref_camera_exy_scenemode_entryvalue_promode);
+        if (proMode.equals(mSceneMode)) {
+                mSceneMode = Parameters.SCENE_MODE_AUTO;
+        } else {
+            mSceneMode = mPreferences.getString(CameraSettings.KEY_EXYNOS_SCENE_MODE,
+                    mActivity.getString(R.string.pref_camera_scenemode_default));
+        }
 
-                // Setting scene mode will change the settings of flash mode,
-                // white balance, and focus mode. Here we read back the
-                // parameters, so we can know those settings.
-                mCameraDevice.setParameters(mParameters);
-                mParameters = mCameraDevice.getParameters();
-            }
+        if (!mParameters.getSceneMode().equals(mSceneMode)) {
+            mParameters.setSceneMode(mSceneMode);
+
+            // Setting scene mode will change the settings of flash mode,
+            // white balance, and focus mode. Here we read back the
+            // parameters, so we can know those settings.
+            mCameraDevice.setParameters(mParameters);
+            mParameters = mCameraDevice.getParameters();
         }
 
         // Set JPEG quality.

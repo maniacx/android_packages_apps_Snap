@@ -297,6 +297,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_SHARPNESS = "pref_camera_exy_sharpness_key";
     public static final String KEY_EXYNOS_COLOR_EFFECT = "pref_camera_exy_coloreffect_key";
     public static final String KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT = "pref_camera_exy_video_coloreffect_key";
+    public static final String KEY_EXYNOS_SCENE_MODE = "pref_camera_exy_scenemode_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -1847,6 +1848,8 @@ public class CameraSettings {
         ListPreference exynos_sharpness = group.findPreference(KEY_EXYNOS_SHARPNESS);
         ListPreference exynos_colorEffect = group.findPreference(KEY_EXYNOS_COLOR_EFFECT);
         ListPreference exynos_camcorderColorEffect = group.findPreference(KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT);
+        ListPreference exynos_sceneMode = group.findPreference(KEY_EXYNOS_SCENE_MODE);
+
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MAX_SATURATION)) {
@@ -1866,9 +1869,17 @@ public class CameraSettings {
             filterUnsupportedOptions(group,
                     exynos_colorEffect, supportedColorModes);
         }
+
         if (exynos_camcorderColorEffect != null) {
             filterUnsupportedOptions(group,
                     exynos_camcorderColorEffect, supportedColorModes);
         }
+
+        if (exynos_sceneMode != null) {
+            String[] sceneModes = mContext.getResources().getStringArray(R.array.supported_scenemode);
+            List<String> supportedSceneModes = Arrays.asList(sceneModes);
+            filterUnsupportedOptions(group, exynos_sceneMode, supportedSceneModes);
+        }
+
     }
 }

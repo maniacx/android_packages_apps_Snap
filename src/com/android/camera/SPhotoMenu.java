@@ -537,7 +537,7 @@ public class SPhotoMenu extends MenuController
     @Override
     public void overrideSettings(final String... keyvalues) {
         for (int i = 0; i < keyvalues.length; i += 2) {
-            if (keyvalues[i].equals(CameraSettings.KEY_SCENE_MODE)) {
+            if (keyvalues[i].equals(CameraSettings.KEY_EXYNOS_SCENE_MODE)) {
                 buttonSetEnabled(mSceneModeSwitcher, keyvalues[i + 1] == null);
             }
         }
@@ -567,7 +567,7 @@ public class SPhotoMenu extends MenuController
         mListMenu = popup1;
 
         ListPreference pref = mPreferenceGroup.findPreference(
-                CameraSettings.KEY_SCENE_MODE);
+                CameraSettings.KEY_EXYNOS_SCENE_MODE);
         updateFilterModeIcon(pref, mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR));
         String sceneMode = (pref != null) ? pref.getValue() : null;
         pref = mPreferenceGroup.findPreference(CameraSettings.KEY_FACE_DETECTION);
@@ -595,14 +595,14 @@ public class SPhotoMenu extends MenuController
             buttonSetEnabled(mHdrSwitcher,false);
             buttonSetEnabled(mSceneModeSwitcher,false);
             buttonSetEnabled(mFilterModeSwitcher,false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_SCENE_MODE,false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SCENE_MODE,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_CAMERA_HDR,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_LONGSHOT,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_PICTURE_SIZE,false);
 
-            setPreference(CameraSettings.KEY_SCENE_MODE,
+            setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE,
                     mActivity.getString(R.string.pref_camera_scenemode_default));
             setPreference(CameraSettings.KEY_CAMERA_HDR,"off");
             setPreference(CameraSettings.KEY_FLASH_MODE, "off");
@@ -623,11 +623,11 @@ public class SPhotoMenu extends MenuController
 
     private void updateFilterModeIcon(ListPreference scenePref, ListPreference hdrPref) {
         if (scenePref == null || hdrPref == null) return;
-        if ((notSame(scenePref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_AUTO))
+        if ((notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO))
                 || (notSame(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff))) {
             buttonSetEnabled(mFilterModeSwitcher, false);
             changeFilterModeControlIcon("none");
-        } else if (same(scenePref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_AUTO)
+        } else if (same(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO)
                 && (same(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)
                     || !hdrPref.getKey().equals(CameraSettings.KEY_CAMERA_HDR))) {
             //mFilterModeSwitcher can be enabled only when scene mode is set to auto
@@ -732,7 +732,7 @@ public class SPhotoMenu extends MenuController
     public void initSceneModeButton(View button) {
         button.setVisibility(View.INVISIBLE);
         final IconListPreference pref = (IconListPreference) mPreferenceGroup
-                .findPreference(CameraSettings.KEY_SCENE_MODE);
+                .findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
         if (pref == null)
             return;
         updateSceneModeIcon(pref);
@@ -762,7 +762,7 @@ public class SPhotoMenu extends MenuController
 
     public void addSceneMode() {
         final IconListPreference pref = (IconListPreference) mPreferenceGroup
-                .findPreference(CameraSettings.KEY_SCENE_MODE);
+                .findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
         if (pref == null)
             return;
 
@@ -1141,13 +1141,13 @@ public class SPhotoMenu extends MenuController
     public void onSettingChanged(ListPreference pref) {
         // Reset the scene mode if HDR is set to on. Reset HDR if scene mode is
         // set to non-auto.
-        if (same(pref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
+        if (same(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
             ListPreference hdrPref =
                     mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
             if (hdrPref != null && same(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
                 setPreference(CameraSettings.KEY_CAMERA_HDR, mSettingOn);
             }
-        } else if (notSame(pref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
+        } else if (notSame(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
             ListPreference hdrPref =
                     mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
             if (hdrPref != null && notSame(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
@@ -1155,22 +1155,22 @@ public class SPhotoMenu extends MenuController
             }
         } else if (same(pref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
             ListPreference scenePref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_SCENE_MODE);
-            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_AUTO)) {
-                setPreference(CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_AUTO);
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
+            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO)) {
+                setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO);
             }
             updateSceneModeIcon((IconListPreference) scenePref);
             updateFilterModeIcon(scenePref, pref);
         } else if (same(pref, CameraSettings.KEY_CAMERA_HDR, mSettingOn)) {
             ListPreference scenePref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_SCENE_MODE);
-            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
-                setPreference(CameraSettings.KEY_SCENE_MODE, Parameters.SCENE_MODE_HDR);
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
+            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
+                setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR);
             }
             updateSceneModeIcon((IconListPreference) scenePref);
         }
 
-        if (notSame(pref, CameraSettings.KEY_SCENE_MODE, "auto")) {
+        if (notSame(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, "auto")) {
             setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
                     mActivity.getString(R.string.pref_camera_coloreffect_default));
         }
@@ -1178,7 +1178,7 @@ public class SPhotoMenu extends MenuController
         mHdrSwitcher.setVisibility(View.VISIBLE);
 
         ListPreference hdrPref = mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
-        ListPreference scenePref = mPreferenceGroup.findPreference(CameraSettings.KEY_SCENE_MODE);
+        ListPreference scenePref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
         updateFilterModeIcon(scenePref, hdrPref);
 
         if (same(pref, CameraSettings.KEY_RECORD_LOCATION, "on")) {
@@ -1187,7 +1187,7 @@ public class SPhotoMenu extends MenuController
 
         if (same(pref, CameraSettings.KEY_BOKEH_MODE, "1")) {
             ListPreference scene =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_SCENE_MODE);
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
             updateSceneModeIcon((IconListPreference)scene);
             changeFilterModeControlIcon("none");
             buttonSetEnabled(mHdrSwitcher,false);
