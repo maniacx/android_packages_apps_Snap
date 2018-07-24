@@ -1897,7 +1897,7 @@ public class SPhotoModule
         }
 
         if (!Parameters.SCENE_MODE_AUTO.equals(mSceneMode) &&
-                !"sports".equals(mSceneMode)) {
+                !"sports".equals(mSceneMode) && !"pro-mode".equals(mSceneMode)) {
             flashMode = Parameters.FLASH_MODE_OFF;
             focusMode = mFocusManager.getFocusMode(false);
             disableLongShot = true;
@@ -3334,7 +3334,7 @@ public class SPhotoModule
         mParameters.setJpegQuality(jpegQuality);
 
         if (Parameters.SCENE_MODE_AUTO.equals(mSceneMode) ||
-                "asd".equals(mSceneMode) ||
+                "pro-mode".equals(mSceneMode) ||
                 "sports".equals(mSceneMode)) {
             // Set flash mode.
             String flashMode;

@@ -576,7 +576,7 @@ public class SPhotoMenu extends MenuController
         } else {
             mHdrSwitcher.setVisibility(View.VISIBLE);
         }
-        if ((sceneMode != null) && !Parameters.SCENE_MODE_AUTO.equals(sceneMode)) {
+        if ((sceneMode != null) && !sceneMode.equals("pro-mode")) {
             popup1.setPreferenceEnabled(CameraSettings.KEY_FOCUS_MODE, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
