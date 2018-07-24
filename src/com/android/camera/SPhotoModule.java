@@ -1362,9 +1362,6 @@ public class SPhotoModule
             }
             if (mIsImageCaptureIntent) {
                 stopPreview();
-            } else if (mSceneMode == CameraUtil.SCENE_MODE_HDR) {
-                mUI.showSwitcher();
-                mUI.setSwipingEnabled(true);
             }
 
             ExifInterface exif = Exif.getExif(jpegData);
@@ -1752,12 +1749,6 @@ public class SPhotoModule
         mPostViewPictureCallbackTime = 0;
         mJpegImageData = null;
 
-        final boolean animateBefore = (mSceneMode == CameraUtil.SCENE_MODE_HDR);
-
-        if (animateBefore) {
-            animateAfterShutter();
-        }
-
         if (mCameraState == LONGSHOT) {
             mLongshotSnapNum = 0;
             mCameraDevice.setLongshot(true);
@@ -1793,18 +1784,12 @@ public class SPhotoModule
         mPreviewRestartSupport &= CameraSettings.isInternalPreviewSupported(
                 mParameters);
         mPreviewRestartSupport &= (mBurstSnapNum == 1);
-        // Restart is needed  if HDR is enabled
-        mPreviewRestartSupport &= !CameraUtil.SCENE_MODE_HDR.equals(mSceneMode);
         mPreviewRestartSupport &= PIXEL_FORMAT_JPEG.equalsIgnoreCase(
                 pictureFormat);
 
         mUI.enableShutter(false);
 
-        // We don't want user to press the button again while taking a
-        // multi-second HDR photo. For longshot, no need to disable.
-        if (!CameraUtil.SCENE_MODE_HDR.equals(mSceneMode)) {
-            mHandler.sendEmptyMessageDelayed(UNLOCK_CAM_SHUTTER, 120);
-        }
+        mHandler.sendEmptyMessageDelayed(UNLOCK_CAM_SHUTTER, 120);
 
         if (!isShutterSoundOn()) {
             mCameraDevice.enableShutterSound(false);
@@ -1831,7 +1816,7 @@ public class SPhotoModule
             }
         } else {
             mCameraDevice.takePicture(mHandler,
-                    new ShutterCallback(!animateBefore),
+                    new ShutterCallback(false),
                     mRawPictureCallback, mPostViewPictureCallback,
                     new JpegPictureCallback(loc));
             setCameraState(SNAPSHOT_IN_PROGRESS);
@@ -1915,20 +1900,7 @@ public class SPhotoModule
                 !"sports".equals(mSceneMode)) {
             flashMode = Parameters.FLASH_MODE_OFF;
             focusMode = mFocusManager.getFocusMode(false);
-            colorEffect = mParameters.getColorEffect();
-            String defaultEffect = mActivity.getString(R.string.pref_camera_coloreffect_default);
-            if (CameraUtil.SCENE_MODE_HDR.equals(mSceneMode)) {
-                disableLongShot = true;
-                if (colorEffect != null & !colorEffect.equals(defaultEffect)) {
-                    // Change the colorEffect to default(None effect) when HDR ON.
-                    colorEffect = defaultEffect;
-                    mUI.setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT, colorEffect);
-                    mParameters.setColorEffect(colorEffect);
-                    mCameraDevice.setParameters(mParameters);
-                    mParameters = mCameraDevice.getParameters();
-                }
-            }
-
+            disableLongShot = true;
         }
 
         if (disableLongShot || mIsBokehMode) {
@@ -2230,11 +2202,6 @@ public class SPhotoModule
             return;
         }
         Log.v(TAG, "onShutterButtonClick: mCameraState=" + mCameraState);
-
-        if (mSceneMode == CameraUtil.SCENE_MODE_HDR) {
-            mUI.hideSwitcher();
-            mUI.setSwipingEnabled(false);
-        }
 
          //Need to disable focus for ZSL mode
         if (mFocusManager != null) {
@@ -3019,6 +2986,15 @@ public class SPhotoModule
             mParameters.set(CameraSettings.KEY_QC_FACE_RECOGNITION, faceRC);
         }
 
+        // Set rthdr mode
+        String rtHdr = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR,
+                mActivity.getString(R.string.pref_camera_exy_rthdr_default));
+        if (CameraUtil.isSupported(rtHdr,
+                CameraSettings.getSupportedRTHdrModes(mParameters))) {
+            Log.v(TAG, "rtHDR Mode value =" + rtHdr);
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, rtHdr);
+        }
 
         // Set face detetction parameter.
         // clear override to re-enable setting if true portrait is off.
@@ -3328,40 +3304,14 @@ public class SPhotoModule
 
         Log.v(TAG, "Thumbnail size is " + optimalSize.width + "x" + optimalSize.height);
 
-        // Since changing scene mode may change supported values, set scene mode
-        // first. HDR is a scene mode. To promote it in UI, it is stored in a
-        // separate preference.
-        String onValue = mActivity.getString(R.string.setting_on_value);
-        String hdr = mPreferences.getString(CameraSettings.KEY_CAMERA_HDR,
-                mActivity.getString(R.string.pref_camera_hdr_default));
-        boolean hdrOn = onValue.equals(hdr);
+        mSceneMode = mPreferences.getString(CameraSettings.KEY_EXYNOS_SCENE_MODE,
+                mActivity.getString(R.string.pref_camera_scenemode_default));
 
-
-        if (hdrOn) {
-            mSceneMode = CameraUtil.SCENE_MODE_HDR;
-            if (!(Parameters.SCENE_MODE_AUTO).equals(mParameters.getSceneMode())
-                && !(Parameters.SCENE_MODE_HDR).equals(mParameters.getSceneMode())) {
-                mParameters.setSceneMode(Parameters.SCENE_MODE_AUTO);
-                mCameraDevice.setParameters(mParameters);
-                mParameters = mCameraDevice.getParameters();
-            }
-        } else {
-            mSceneMode = mPreferences.getString(
-                    CameraSettings.KEY_EXYNOS_SCENE_MODE,
-                    mActivity.getString(R.string.pref_camera_scenemode_default));
-        }
-
-        if (mSceneMode == null) {
-            mSceneMode = Parameters.SCENE_MODE_AUTO;
-        }
 
         String proMode = mActivity.getString(R.string
                 .pref_camera_exy_scenemode_entryvalue_promode);
         if (proMode.equals(mSceneMode)) {
                 mSceneMode = Parameters.SCENE_MODE_AUTO;
-        } else {
-            mSceneMode = mPreferences.getString(CameraSettings.KEY_EXYNOS_SCENE_MODE,
-                    mActivity.getString(R.string.pref_camera_scenemode_default));
         }
 
         if (!mParameters.getSceneMode().equals(mSceneMode)) {
@@ -3533,7 +3483,6 @@ public class SPhotoModule
     public void onSharedPreferenceChanged(ListPreference pref) {
         // ignore the events after "onPause()"
         if (mPaused) return;
-
 
         if (CameraSettings.KEY_CAMERA_SAVEPATH.equals(pref.getKey())) {
             Storage.setSaveSDCard(

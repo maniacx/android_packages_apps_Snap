@@ -298,6 +298,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_COLOR_EFFECT = "pref_camera_exy_coloreffect_key";
     public static final String KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT = "pref_camera_exy_video_coloreffect_key";
     public static final String KEY_EXYNOS_SCENE_MODE = "pref_camera_exy_scenemode_key";
+    public static final String KEY_EXYNOS_CAMERA_RT_HDR = "pref_camera_exy_rt_hdr_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -305,6 +306,9 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_CUR_SHARPNESS = "sharpness";
     public static final String KEY_EXYNOS_MIN_SHARPNESS = "sharpness-min";
     public static final String KEY_EXYNOS_MAX_SHARPNESS = "sharpness-max";
+    public static final String KEY_EXYNOS_RT_HDR = "rt-hdr";
+
+    private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
 // End of Exynos5Camera
 
     private static final String TAG = "CameraSettings";
@@ -1849,6 +1853,7 @@ public class CameraSettings {
         ListPreference exynos_colorEffect = group.findPreference(KEY_EXYNOS_COLOR_EFFECT);
         ListPreference exynos_camcorderColorEffect = group.findPreference(KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT);
         ListPreference exynos_sceneMode = group.findPreference(KEY_EXYNOS_SCENE_MODE);
+        ListPreference exynos_realTimeHdr = group.findPreference(KEY_EXYNOS_CAMERA_RT_HDR);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -1881,5 +1886,17 @@ public class CameraSettings {
             filterUnsupportedOptions(group, exynos_sceneMode, supportedSceneModes);
         }
 
+        if (exynos_realTimeHdr != null) {
+            filterUnsupportedOptions(group,
+                    exynos_realTimeHdr, getSupportedRTHdrModes(mParameters));
+        }
+    }
+
+    public static List<String> getSupportedRTHdrModes(Parameters params) {
+        String str = params.get(KEY_EXYNOS_SUPPORTED_RT_HDR);
+        if (str == null) {
+            return null;
+        }
+        return split(str);
     }
 }

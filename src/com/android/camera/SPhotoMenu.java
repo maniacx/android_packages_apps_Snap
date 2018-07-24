@@ -146,9 +146,9 @@ public class SPhotoMenu extends MenuController
 
         mFrontBackSwitcher.setVisibility(View.INVISIBLE);
 
-        if (group.findPreference(CameraSettings.KEY_CAMERA_HDR) != null) {
+        if (group.findPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR) != null) {
             mHdrSwitcher.setVisibility(View.VISIBLE);
-            initSwitchItem(CameraSettings.KEY_CAMERA_HDR, mHdrSwitcher);
+            initSwitchItem(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR, mHdrSwitcher);
         } else {
             mHdrSwitcher.setVisibility(View.INVISIBLE);
         }
@@ -568,10 +568,16 @@ public class SPhotoMenu extends MenuController
 
         ListPreference pref = mPreferenceGroup.findPreference(
                 CameraSettings.KEY_EXYNOS_SCENE_MODE);
-        updateFilterModeIcon(pref, mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR));
+        updateFilterModeIcon(pref, mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR));
         String sceneMode = (pref != null) ? pref.getValue() : null;
         pref = mPreferenceGroup.findPreference(CameraSettings.KEY_FACE_DETECTION);
         String faceDetection = (pref != null) ? pref.getValue() : null;
+        if ((sceneMode != null) && !(sceneMode.equals("auto") || sceneMode.equals("pro-mode"))) {
+            mHdrSwitcher.setVisibility(View.GONE);
+            mUI.getCameraControls().removeFromViewList(mHdrSwitcher);
+        } else {
+            mHdrSwitcher.setVisibility(View.VISIBLE);
+        }
         if ((sceneMode != null) && !Parameters.SCENE_MODE_AUTO.equals(sceneMode)) {
             popup1.setPreferenceEnabled(CameraSettings.KEY_FOCUS_MODE, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
@@ -583,12 +589,6 @@ public class SPhotoMenu extends MenuController
             popup1.setPreferenceEnabled(CameraSettings.KEY_FACE_RECOGNITION, false);
         }
 
-        if (mHdrSwitcher.getVisibility() == View.VISIBLE) {
-            buttonSetEnabled(mHdrSwitcher, true);
-        }
-
-        mHdrSwitcher.setVisibility(View.VISIBLE);
-
         pref = mPreferenceGroup.findPreference(CameraSettings.KEY_BOKEH_MODE);
         String bokeh = (pref != null) ? pref.getValue() : null;
         if ("1".equals(bokeh)) {
@@ -596,7 +596,7 @@ public class SPhotoMenu extends MenuController
             buttonSetEnabled(mSceneModeSwitcher,false);
             buttonSetEnabled(mFilterModeSwitcher,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SCENE_MODE,false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_CAMERA_HDR,false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_LONGSHOT,false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,false);
@@ -604,7 +604,7 @@ public class SPhotoMenu extends MenuController
 
             setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE,
                     mActivity.getString(R.string.pref_camera_scenemode_default));
-            setPreference(CameraSettings.KEY_CAMERA_HDR,"off");
+            setPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR,"off");
             setPreference(CameraSettings.KEY_FLASH_MODE, "off");
             setPreference(CameraSettings.KEY_LONGSHOT, "off");
             setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,"none");
@@ -623,16 +623,17 @@ public class SPhotoMenu extends MenuController
 
     private void updateFilterModeIcon(ListPreference scenePref, ListPreference hdrPref) {
         if (scenePref == null || hdrPref == null) return;
-        if ((notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO))
-                || (notSame(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff))) {
-            buttonSetEnabled(mFilterModeSwitcher, false);
-            changeFilterModeControlIcon("none");
-        } else if (same(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO)
-                && (same(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)
-                    || !hdrPref.getKey().equals(CameraSettings.KEY_CAMERA_HDR))) {
-            //mFilterModeSwitcher can be enabled only when scene mode is set to auto
-            // and HDR is set to off,
-            buttonSetEnabled(mFilterModeSwitcher, true);
+        if (notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO)) {
+            mFilterModeSwitcher.setVisibility(View.GONE);
+            mUI.getCameraControls().removeFromViewList(mFilterModeSwitcher);
+        } else {
+            mFilterModeSwitcher.setVisibility(View.VISIBLE);
+            if (notSame(hdrPref, CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR, mSettingOff)) {
+                buttonSetEnabled(mFilterModeSwitcher, false);
+                changeFilterModeControlIcon("none");
+            } else {
+                buttonSetEnabled(mFilterModeSwitcher, true);
+            }
         }
     }
 
@@ -1139,47 +1140,41 @@ public class SPhotoMenu extends MenuController
 
     @Override
     public void onSettingChanged(ListPreference pref) {
-        // Reset the scene mode if HDR is set to on. Reset HDR if scene mode is
-        // set to non-auto.
-        if (same(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
-            ListPreference hdrPref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
-            if (hdrPref != null && same(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
-                setPreference(CameraSettings.KEY_CAMERA_HDR, mSettingOn);
-            }
-        } else if (notSame(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
-            ListPreference hdrPref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
-            if (hdrPref != null && notSame(hdrPref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
-                setPreference(CameraSettings.KEY_CAMERA_HDR, mSettingOff);
-            }
-        } else if (same(pref, CameraSettings.KEY_CAMERA_HDR, mSettingOff)) {
-            ListPreference scenePref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
-            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO)) {
-                setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_AUTO);
-            }
-            updateSceneModeIcon((IconListPreference) scenePref);
-            updateFilterModeIcon(scenePref, pref);
-        } else if (same(pref, CameraSettings.KEY_CAMERA_HDR, mSettingOn)) {
-            ListPreference scenePref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
-            if (scenePref != null && notSame(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR)) {
-                setPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE, Parameters.SCENE_MODE_HDR);
-            }
-            updateSceneModeIcon((IconListPreference) scenePref);
-        }
+
+        ListPreference scenePref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
+        ListPreference hdrPref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR);
+        IconListPreference colorpref = (IconListPreference) mPreferenceGroup
+                .findPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT);
+
 
         if (notSame(pref, CameraSettings.KEY_EXYNOS_SCENE_MODE, "auto")) {
             setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
                     mActivity.getString(R.string.pref_camera_coloreffect_default));
         }
 
-        mHdrSwitcher.setVisibility(View.VISIBLE);
 
-        ListPreference hdrPref = mPreferenceGroup.findPreference(CameraSettings.KEY_CAMERA_HDR);
-        ListPreference scenePref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
+        if (notSame(hdrPref, CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR, "off")) {
+            if (colorpref != null && notSame(colorpref, CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
+                    mActivity.getString(R.string.pref_camera_coloreffect_default))) {
+                setPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT,
+                        mActivity.getString(R.string.pref_camera_coloreffect_default));
+            }
+        }
+
         updateFilterModeIcon(scenePref, hdrPref);
+
+        if ((same(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, "auto"))
+            || (same(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, "pro-mode"))) {
+            mHdrSwitcher.setVisibility(View.VISIBLE);
+        } else {
+            if (hdrPref != null && notSame(hdrPref, CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR,
+                    mActivity.getString(R.string.pref_camera_exy_rthdr_default))) {
+                setPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR,
+                        mActivity.getString(R.string.pref_camera_exy_rthdr_default));
+            }
+            mHdrSwitcher.setVisibility(View.GONE);
+            mUI.getCameraControls().removeFromViewList(mHdrSwitcher);
+        }
 
         if (same(pref, CameraSettings.KEY_RECORD_LOCATION, "on")) {
             mActivity.requestLocationPermission();
