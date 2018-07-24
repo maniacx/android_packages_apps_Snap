@@ -2928,14 +2928,12 @@ public class SPhotoModule
         mParameters.set(KEY_PICTURE_FORMAT, pictureFormat);
 
         // Set JPEG quality.
-        String jpegQuality = mPreferences.getString(
-                CameraSettings.KEY_JPEG_QUALITY,
-                mActivity.getString(R.string.pref_camera_jpegquality_default));
+        String jpegQuality = mActivity.getString(R.string.pref_exy_camera_jpegquality_default);
         Size pic_size = mParameters.getPictureSize();
         if (pic_size == null) {
             Log.e(TAG, "error getPictureSize: size is null");
         } else {
-            mParameters.setJpegQuality(SJpegEncodingQualityMappings.getQualityNumber(jpegQuality));
+            mParameters.setJpegQuality(Integer.parseInt(jpegQuality));
             int jpegFileSize = estimateJpegFileSize(pic_size, jpegQuality);
             if (jpegFileSize != mJpegFileSizeEstimation) {
                 mJpegFileSizeEstimation = jpegFileSize;
@@ -3730,42 +3728,6 @@ public class SPhotoModule
     public boolean isLongshotDone() {
         return ((mCameraState == LONGSHOT) && (mLongshotSnapNum == mReceivedSnapNum) &&
                 !mLongshotActive);
-    }
-}
-
-/* Below is no longer needed, except to get rid of compile error
- * TODO: Remove these
- */
-class SJpegEncodingQualityMappings {
-    private static final String TAG = "SJpegEncodingQualityMappings";
-    private static final int DEFAULT_QUALITY = 85;
-    private static HashMap<String, Integer> mHashMap =
-            new HashMap<String, Integer>();
-
-    static {
-        mHashMap.put("normal",    CameraProfile.QUALITY_LOW);
-        mHashMap.put("fine",      CameraProfile.QUALITY_MEDIUM);
-        mHashMap.put("superfine", CameraProfile.QUALITY_HIGH);
-    }
-
-    // Retrieve and return the Jpeg encoding quality number
-    // for the given quality level.
-    public static int getQualityNumber(String jpegQuality) {
-        try{
-            int qualityPercentile = Integer.parseInt(jpegQuality);
-            if(qualityPercentile >= 0 && qualityPercentile <=100)
-                return qualityPercentile;
-            else
-                return DEFAULT_QUALITY;
-        } catch(NumberFormatException nfe){
-            //chosen quality is not a number, continue
-        }
-        Integer quality = mHashMap.get(jpegQuality);
-        if (quality == null) {
-            Log.w(TAG, "Unknown Jpeg quality: " + jpegQuality);
-            return DEFAULT_QUALITY;
-        }
-        return CameraProfile.getJpegEncodingQualityParameter(quality.intValue());
     }
 }
 

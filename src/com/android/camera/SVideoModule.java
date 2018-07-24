@@ -2859,8 +2859,7 @@ public class SVideoModule implements CameraModule,
         Log.v(TAG, "Thumbnail size is " + optimalSize.width + "x" + optimalSize.height);
 
         // Set JPEG quality.
-        int jpegQuality = CameraProfile.getJpegEncodingQualityParameter(mCameraId,
-                CameraProfile.QUALITY_HIGH);
+        int jpegQuality = Integer.parseInt(mActivity.getString(R.string.pref_exy_camera_jpegquality_default));
         mParameters.setJpegQuality(jpegQuality);
 
         CameraUtil.dumpParameters(mParameters);
