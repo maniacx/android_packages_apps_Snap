@@ -114,7 +114,7 @@
     <!-- Camera Preferences Scenemode icons -->
     <array name="exy_scenemode_thumbnails" translatable="false">
         <item>@drawable/ic_scene_mode_auto</item>
-        <item>@drawable/promode</item>
+        <item>@drawable/ic_scene_mode_pro</item>
         <item>@drawable/ic_scene_mode_action</item>
         <item>@drawable/ic_scene_mode_entry_antimotionblur</item>
         <item>@drawable/ic_scene_mode_entry_aqua</item>
