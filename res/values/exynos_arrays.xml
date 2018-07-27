@@ -242,11 +242,32 @@
         <item>@string/setting_auto_value</item>
     </string-array>
 
-    <!-- Camera Preferences Realtime HDR lables -->
+    <!-- Camera Preferences Realtime HDR labels -->
     <string-array name="pref_camera_exy_rthdr_labels" translatable="false">
         <item>@string/pref_camera_exy_rthdr_labels_off</item>
         <item>@string/pref_camera_exy_rthdr_labels_on</item>
         <item>@string/pref_camera_exy_rthdr_labels_auto</item>
+    </string-array>
+
+    <!-- Camera Preferences Realtime HDR lables -->
+    <string-array name="pref_camera_exy_metering_mode_icons" translatable="false">
+        <item>@drawable/ic_metering_matrix</item>
+        <item>@drawable/ic_metering_spot</item>
+        <item>@drawable/ic_metering_center</item>
+    </string-array>
+
+    <!-- Camera Preferences Metering Modes entries -->
+    <string-array name="pref_camera_exy_metering_mode_entries" translatable="false">
+        <item>@string/pref_camera_exy_metering_mode_entry_spot</item>
+        <item>@string/pref_camera_exy_metering_mode_entry_center</item>
+        <item>@string/pref_camera_exy_metering_mode_entry_matrix</item>
+    </string-array>
+
+    <!-- Camera Preferences Metering Modes entries -->
+    <string-array name="pref_camera_exy_metering_mode_entryvalues" translatable="false">
+         <item>@string/pref_camera_exy_metering_mode_value_spot</item>
+         <item>@string/pref_camera_exy_metering_mode_value_center</item>
+         <item>@string/pref_camera_exy_metering_mode_value_matrix</item>
     </string-array>
 
 </resources>

@@ -96,6 +96,7 @@ public class SPhotoMenu extends MenuController
     private static final int DEVELOPER_MENU_TOUCH_COUNT = 7;
     private int mSceneStatus;
     private View mHdrSwitcher;
+    private View mMeteringSwitcher;
     private View mBokehSwitcher;
     private View mFrontBackSwitcher;
     private View mSceneModeSwitcher;
@@ -122,6 +123,7 @@ public class SPhotoMenu extends MenuController
         mActivity = activity;
         mFrontBackSwitcher = ui.getRootView().findViewById(R.id.front_back_switcher);
         mHdrSwitcher = ui.getRootView().findViewById(R.id.hdr_switcher);
+        mMeteringSwitcher = ui.getRootView().findViewById(R.id.metering_switcher);
         mSceneModeSwitcher = ui.getRootView().findViewById(R.id.scene_mode_switcher);
         mBokehSwitcher = ui.getRootView().findViewById(R.id.bokeh_switcher);
         mFilterModeSwitcher = ui.getRootView().findViewById(R.id.filter_mode_switcher);
@@ -151,6 +153,13 @@ public class SPhotoMenu extends MenuController
             initSwitchItem(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR, mHdrSwitcher);
         } else {
             mHdrSwitcher.setVisibility(View.INVISIBLE);
+        }
+
+        if (group.findPreference(CameraSettings.KEY_EXYNOS_METERING_MODE) != null) {
+            mMeteringSwitcher.setVisibility(View.VISIBLE);
+            initSwitchItem(CameraSettings.KEY_EXYNOS_METERING_MODE, mMeteringSwitcher);
+        } else {
+            mMeteringSwitcher.setVisibility(View.INVISIBLE);
         }
 
         mOtherKeys1 = new String[] {
@@ -581,6 +590,10 @@ public class SPhotoMenu extends MenuController
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE, false);
+            mMeteringSwitcher.setVisibility(View.GONE);
+            mUI.getCameraControls().removeFromViewList(mMeteringSwitcher);
+        } else {
+            mMeteringSwitcher.setVisibility(View.VISIBLE);
         }
 
         if ((faceDetection != null) && !ParametersWrapper.FACE_DETECTION_ON.equals(faceDetection)) {
@@ -1141,6 +1154,7 @@ public class SPhotoMenu extends MenuController
 
         ListPreference scenePref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SCENE_MODE);
         ListPreference hdrPref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_CAMERA_RT_HDR);
+        ListPreference meteringPref = mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_METERING_MODE);
         IconListPreference colorpref = (IconListPreference) mPreferenceGroup
                 .findPreference(CameraSettings.KEY_EXYNOS_COLOR_EFFECT);
 
@@ -1172,6 +1186,18 @@ public class SPhotoMenu extends MenuController
             }
             mHdrSwitcher.setVisibility(View.GONE);
             mUI.getCameraControls().removeFromViewList(mHdrSwitcher);
+        }
+
+        if (same(scenePref, CameraSettings.KEY_EXYNOS_SCENE_MODE, "pro-mode")) {
+            mMeteringSwitcher.setVisibility(View.VISIBLE);
+        } else {
+            if (meteringPref != null && notSame(meteringPref, CameraSettings.KEY_EXYNOS_METERING_MODE,
+                    mActivity.getString(R.string.pref_camera_exy_metering_mode_default))) {
+                setPreference(CameraSettings.KEY_EXYNOS_METERING_MODE,
+                        mActivity.getString(R.string.pref_camera_exy_metering_mode_default));
+            }
+            mMeteringSwitcher.setVisibility(View.GONE);
+            mUI.getCameraControls().removeFromViewList(mMeteringSwitcher);
         }
 
         if (same(pref, CameraSettings.KEY_RECORD_LOCATION, "on")) {

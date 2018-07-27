@@ -2994,6 +2994,16 @@ public class SPhotoModule
             mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, rtHdr);
         }
 
+        // Set metering mode
+        String meteringMode = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_METERING_MODE,
+                mActivity.getString(R.string.pref_camera_exy_metering_mode_default));
+        if (CameraUtil.isSupported(meteringMode,
+                CameraSettings.getMeteringModes(mParameters))) {
+            Log.v(TAG, "meteringMode Mode value =" + meteringMode);
+            mParameters.set(CameraSettings.KEY_EXYNOS_METERING, meteringMode);
+        }
+
         // Set face detetction parameter.
         // clear override to re-enable setting if true portrait is off.
         mActivity.runOnUiThread(new Runnable() {

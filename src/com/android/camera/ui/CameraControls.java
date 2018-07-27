@@ -63,6 +63,7 @@ public class CameraControls extends RotatableLayout {
     private View mPreview;
     private View mSceneModeSwitcher;
     private View mFilterModeSwitcher;
+    private View mMeteringSwitcher;
     private View mReviewDoneButton;
     private View mReviewCancelButton;
     private View mReviewRetakeButton;
@@ -87,7 +88,8 @@ public class CameraControls extends RotatableLayout {
     private static final int VIDEO_SHUTTER_INDEX = 10;
     private static final int EXIT_PANORAMA_INDEX = 11;
     private static final int BOKEH_INDEX = 12;
-    private static final int MAX_INDEX= 13;
+    private static final int METERING_MODE_INDEX = 13;
+    private static final int MAX_INDEX= 14;
     private static final int ANIME_DURATION = 300;
     private float[][] mLocX = new float[4][MAX_INDEX];
     private float[][] mLocY = new float[4][MAX_INDEX];
@@ -134,6 +136,7 @@ public class CameraControls extends RotatableLayout {
             }
             mSceneModeSwitcher.setVisibility(View.INVISIBLE);
             mFilterModeSwitcher.setVisibility(View.INVISIBLE);
+            mMeteringSwitcher.setVisibility(View.INVISIBLE);
             mSwitcher.setVisibility(View.INVISIBLE);
             mShutter.setVisibility(View.INVISIBLE);
             mVideoShutter.setVisibility(View.INVISIBLE);
@@ -160,6 +163,7 @@ public class CameraControls extends RotatableLayout {
             }
             mSceneModeSwitcher.setVisibility(View.INVISIBLE);
             mFilterModeSwitcher.setVisibility(View.INVISIBLE);
+            mMeteringSwitcher.setVisibility(View.INVISIBLE);
             mSwitcher.setVisibility(View.INVISIBLE);
             mShutter.setVisibility(View.INVISIBLE);
             mVideoShutter.setVisibility(View.INVISIBLE);
@@ -282,6 +286,8 @@ public class CameraControls extends RotatableLayout {
             mViewList.add(mSceneModeSwitcher);
         if (mFilterModeSwitcher.getVisibility() == View.VISIBLE)
             mViewList.add(mFilterModeSwitcher);
+        if (mMeteringSwitcher.getVisibility() == View.VISIBLE)
+            mViewList.add(mMeteringSwitcher);
         if (mShutter.getVisibility() == View.VISIBLE)
             mViewList.add(mShutter);
         if (mVideoShutter.getVisibility() == View.VISIBLE)
@@ -321,6 +327,7 @@ public class CameraControls extends RotatableLayout {
         mPreview = findViewById(R.id.preview_thumb);
         mSceneModeSwitcher = findViewById(R.id.scene_mode_switcher);
         mFilterModeSwitcher = findViewById(R.id.filter_mode_switcher);
+        mMeteringSwitcher = findViewById(R.id.metering_switcher);
         mRemainingPhotos = (LinearLayout) findViewById(R.id.remaining_photos);
         mRemainingPhotosText = (TextView) findViewById(R.id.remaining_photos_text);
     }
@@ -404,6 +411,7 @@ public class CameraControls extends RotatableLayout {
         toIndex(mSceneModeSwitcher, w, h, rotation, 4, 0, SCENE_MODE_INDEX);
         toIndex(mMute, w, h, rotation, 4, 0, MUTE_INDEX);
         toIndex(mFilterModeSwitcher, w, h, rotation, 3, 0, FILTER_MODE_INDEX);
+        toIndex(mMeteringSwitcher, w, h, rotation, 3, 0, METERING_MODE_INDEX);
         toIndex(mExitPanorama, w, h, rotation, 0, 0, EXIT_PANORAMA_INDEX);
         toIndex(mFrontBackSwitcher, w, h, rotation, 1, 0, FRONT_BACK_INDEX);
         toIndex(mPreview, w, h, rotation, 0, 6, PREVIEW_INDEX);
@@ -514,6 +522,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.setX(mLocX[idx1][SCENE_MODE_INDEX] + x);
         mFilterModeSwitcher.setX(mLocX[idx1][FILTER_MODE_INDEX] + x);
+        mMeteringSwitcher.setX(mLocX[idx1][METERING_MODE_INDEX] + x);
         mMenu.setX(mLocX[idx1][MENU_INDEX] + x);
         mMute.setX(mLocX[idx1][MUTE_INDEX] + x);
         mExitPanorama.setX(mLocX[idx1][EXIT_PANORAMA_INDEX] + x);
@@ -533,6 +542,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.setY(mLocY[idx1][SCENE_MODE_INDEX] + y);
         mFilterModeSwitcher.setY(mLocY[idx1][FILTER_MODE_INDEX] + y);
+        mMeteringSwitcher.setY(mLocY[idx1][METERING_MODE_INDEX] + y);
         mMenu.setY(mLocY[idx1][MENU_INDEX] + y);
         mMute.setY(mLocY[idx1][MUTE_INDEX] + y);
         mExitPanorama.setY(mLocY[idx1][EXIT_PANORAMA_INDEX] + y);
@@ -547,6 +557,7 @@ public class CameraControls extends RotatableLayout {
         mMenu.setVisibility(status);
         mSceneModeSwitcher.setVisibility(status);
         mFilterModeSwitcher.setVisibility(status);
+        mMeteringSwitcher.setVisibility(status);
         if(TsMakeupManager.HAS_TS_MAKEUP) {
             mTsMakeupSwitcher.setVisibility(status);
         } else {
@@ -584,6 +595,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.animate().cancel();
         mFilterModeSwitcher.animate().cancel();
+        mMeteringSwitcher.animate().cancel();
         mSwitcher.animate().cancel();
         mShutter.animate().cancel();
         mVideoShutter.animate().cancel();
@@ -608,6 +620,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
@@ -629,6 +642,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
@@ -650,6 +664,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
@@ -671,6 +686,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
@@ -701,6 +717,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.animate().cancel();
         mFilterModeSwitcher.animate().cancel();
+        mMeteringSwitcher.animate().cancel();
         mSwitcher.animate().cancel();
         mShutter.animate().cancel();
         mVideoShutter.animate().cancel();
@@ -736,6 +753,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationYBy(mSize).setDuration(ANIME_DURATION);
@@ -759,6 +777,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationXBy(mSize).setDuration(ANIME_DURATION);
@@ -782,6 +801,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationYBy(-mSize).setDuration(ANIME_DURATION);
@@ -805,6 +825,7 @@ public class CameraControls extends RotatableLayout {
                 }
                 mSceneModeSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mFilterModeSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
+                mMeteringSwitcher.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mMenu.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mMute.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
                 mExitPanorama.animate().translationXBy(-mSize).setDuration(ANIME_DURATION);
@@ -1079,7 +1100,7 @@ public class CameraControls extends RotatableLayout {
     public void setOrientation(int orientation, boolean animation) {
         mOrientation = orientation;
         View[] views = {
-            mSceneModeSwitcher, mFilterModeSwitcher, mFrontBackSwitcher,
+            mSceneModeSwitcher, mFilterModeSwitcher, mMeteringSwitcher, mFrontBackSwitcher,
             TsMakeupManager.HAS_TS_MAKEUP ? mTsMakeupSwitcher : mHdrSwitcher,mBokehSwitcher,
             mMenu, mPreview, mSwitcher, mMute, mReviewRetakeButton,
             mReviewCancelButton, mReviewDoneButton, mExitPanorama
@@ -1105,6 +1126,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.setVisibility(View.INVISIBLE);
         mFilterModeSwitcher.setVisibility(View.INVISIBLE);
+        mMeteringSwitcher.setVisibility(View.INVISIBLE);
         mMenu.setVisibility(View.INVISIBLE);
     }
 
@@ -1120,6 +1142,7 @@ public class CameraControls extends RotatableLayout {
         }
         mSceneModeSwitcher.setVisibility(View.VISIBLE);
         mFilterModeSwitcher.setVisibility(View.VISIBLE);
+        mMeteringSwitcher.setVisibility(View.VISIBLE);
         mMenu.setVisibility(View.VISIBLE);
     }
 

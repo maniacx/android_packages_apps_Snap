@@ -65,6 +65,24 @@
     <!-- Default Jpeg quality strings -->
     <string name="pref_exy_camera_jpegquality_default">96</string>
 
+
+    <!-- Settings screen, metering mode title -->
+    <string name="pref_camera_exy_metering_mode_title">Metering mode</string>
+
+    <!-- Default metering modes setting. Do not translate. -->
+    <string name="pref_camera_exy_metering_mode_default" translatable="false">center</string>
+
+    <!-- Settings screen, metering modes entries -->
+    <string name="pref_camera_exy_metering_mode_entry_spot">Spot</string>
+    <string name="pref_camera_exy_metering_mode_entry_center">Center</string>
+    <string name="pref_camera_exy_metering_mode_entry_matrix">Matrix</string>
+
+    <!-- Settings screen, metering modes entries values -->
+    <string name="pref_camera_exy_metering_mode_value_spot" translatable="false">spot</string>
+    <string name="pref_camera_exy_metering_mode_value_center" translatable="false">center</string>
+    <string name="pref_camera_exy_metering_mode_value_matrix" translatable="false">matrix</string>
+
+
 </resources>
 
 
