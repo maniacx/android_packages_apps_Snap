@@ -309,6 +309,16 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_MAX_SHARPNESS = "sharpness-max";
     public static final String KEY_EXYNOS_RT_HDR = "rt-hdr";
     public static final String KEY_EXYNOS_METERING = "metering";
+    public static final String KEY_EXYNOS_SHOTMODE = "shot-mode";
+    public static final String KEY_EXYNOS_SHOT_AUTO = "10";
+    public static final String KEY_EXYNOS_SHOT_PRO = "34";
+    public static final String KEY_EXYNOS_SHOT_VIDEO = "0";
+    public static final String KEY_EXYNOS_SHOT_FASTMODE = "31";
+    public static final String KEY_EXYNOS_SHOT_SPORTS = "17";
+    public static final String KEY_EXYNOS_SHOT_PARANOMA = "7";
+    public static final String KEY_EXYNOS_SHOT_SELECTIVE_FOCUS = "20";
+    public static final String KEY_EXYNOS_SHOT_BEAUTY = "2";
+    public static final String KEY_EXYNOS_SHOT_VIRTUALMODE = "29";
 
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
     private static final String KEY_EXYNOS_METERING_VALUES = "metering-values";

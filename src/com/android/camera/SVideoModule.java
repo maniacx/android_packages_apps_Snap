@@ -2528,6 +2528,9 @@ public class SVideoModule implements CameraModule,
         Log.i(TAG,"NOTE: qcomSetCameraParameters " + videoWidth + " x " + videoHeight);
 
         setZoomMenuValue();
+
+        mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_VIDEO);
+
         String colorEffect = mPreferences.getString(
             CameraSettings.KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT,
             mActivity.getString(R.string.pref_camera_coloreffect_default));

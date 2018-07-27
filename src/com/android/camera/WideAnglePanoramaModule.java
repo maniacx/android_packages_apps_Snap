@@ -479,6 +479,7 @@ public class WideAnglePanoramaModule
         }
 
         parameters.set(CameraUtil.RECORDING_HINT, CameraUtil.FALSE);
+        parameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_PARANOMA);
 
         mHorizontalViewAngle = parameters.getHorizontalViewAngle();
         mVerticalViewAngle =  parameters.getVerticalViewAngle();

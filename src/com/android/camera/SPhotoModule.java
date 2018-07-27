@@ -3316,10 +3316,16 @@ public class SPhotoModule
                 mActivity.getString(R.string.pref_camera_scenemode_default));
 
 
-        String proMode = mActivity.getString(R.string
-                .pref_camera_exy_scenemode_entryvalue_promode);
-        if (proMode.equals(mSceneMode)) {
+        if(mCameraId == 1) {
                 mSceneMode = Parameters.SCENE_MODE_AUTO;
+                mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_BEAUTY);
+        } else if (mSceneMode.equals("pro-mode")) {
+                mSceneMode = Parameters.SCENE_MODE_AUTO;
+                mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_PRO);
+        } else if (mSceneMode.equals("sports")) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_SPORTS);
+        } else {
+                mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_AUTO);
         }
 
         if (!mParameters.getSceneMode().equals(mSceneMode)) {
