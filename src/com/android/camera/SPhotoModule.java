@@ -3053,6 +3053,16 @@ public class SPhotoModule
             mParameters.set(CameraSettings.KEY_EXYNOS_METERING, meteringMode);
         }
 
+        // Set iso mode
+        String iso = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_ISO,
+                mActivity.getString(R.string.pref_camera_exy_iso_default));
+        if (CameraUtil.isSupported(iso,
+                CameraSettings.getIsoModes(mParameters))) {
+            Log.v(TAG, "iso value =" + iso);
+            mParameters.set(CameraSettings.KEY_EXYNOS_CUR_ISO, iso);
+        }
+
         // Set face detetction parameter.
         // clear override to re-enable setting if true portrait is off.
         mActivity.runOnUiThread(new Runnable() {

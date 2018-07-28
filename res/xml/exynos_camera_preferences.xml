@@ -150,12 +150,12 @@
             camera:entries="@array/pref_camera_jpegquality_entries"
             camera:entryValues="@array/pref_camera_jpegquality_entryvalues" />
     <IconListPreference
-            camera:key="pref_camera_iso_key"
-            camera:defaultValue="@string/pref_camera_iso_default"
+            camera:key="pref_camera_exy_iso_key"
+            camera:defaultValue="@string/pref_camera_exy_iso_default"
             camera:title="@string/pref_camera_iso_title"
-            camera:entries="@array/pref_camera_iso_entries"
+            camera:entries="@array/pref_camera_exy_iso_entries"
             camera:singleIcon="@drawable/ic_settings_iso"
-            camera:entryValues="@array/pref_camera_iso_entryvalues" />
+            camera:entryValues="@array/pref_camera_exy_iso_entryvalues" />
     <IconListPreference
             camera:key="pref_camera_antibanding_key"
             camera:defaultValue="@string/pref_camera_antibanding_default"

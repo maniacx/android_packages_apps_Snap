@@ -434,5 +434,27 @@
         <item>10000000</item>
     </string-array>
 
+    <!-- Camera Preferences iso entries -->
+    <string-array name="pref_camera_exy_iso_entries" translatable="false">
+        <item>@string/pref_camera_exy_iso_entry_auto</item>
+        <item>@string/pref_camera_exy_iso_entry_100</item>
+        <item>@string/pref_camera_exy_iso_entry_200</item>
+        <item>@string/pref_camera_exy_iso_entry_400</item>
+        <item>@string/pref_camera_exy_iso_entry_800</item>
+        <item>@string/pref_camera_exy_iso_entry_1600</item>
+        <item>@string/pref_camera_exy_iso_entry_3200</item>
+    </string-array>
+
+    <!-- Camera Preferences iso entries values -->
+    <string-array name="pref_camera_exy_iso_entryvalues" translatable="false">
+         <item>auto</item>
+         <item>100</item>
+         <item>200</item>
+         <item>400</item>
+         <item>800</item>
+         <item>1600</item>
+         <item>3200</item>
+    </string-array>
+
 </resources>
 
