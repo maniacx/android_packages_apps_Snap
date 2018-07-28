@@ -301,6 +301,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_CAMERA_RT_HDR = "pref_camera_exy_rt_hdr_key";
     public static final String KEY_EXYNOS_METERING_MODE = "pref_camera_exy_metering_mode_key";
     public static final String KEY_EXYNOS_EXPOSURE_COMPENSATION = "pref_camera_exy_exposure_compensation_key";
+    public static final String KEY_EXYNOS_EXPOSURE_TIME = "pref_camera_exy_exposure_time_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -315,6 +316,9 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION = "max-exposure-compensation";
     public static final String KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION = "min-exposure-compensation";
     public static final String KEY_EXYNOS_EXPOSURE_COMPENSATION_STEP = "exposure-compensation-step";
+    public static final String KEY_EXYNOS_EXPOSURE_CUR_TIME = "exposure-time";
+    public static final String KEY_EXYNOS_EXPOSURE_MAX_TIME = "max-exposure-time";
+    public static final String KEY_EXYNOS_EXPOSURE_MIN_TIME = "min-exposure-time";
 
     public static final String KEY_EXYNOS_SHOT_AUTO = "10";
     public static final String KEY_EXYNOS_SHOT_PRO = "34";
@@ -1874,6 +1878,7 @@ public class CameraSettings {
         ListPreference exynos_realTimeHdr = group.findPreference(KEY_EXYNOS_CAMERA_RT_HDR);
         ListPreference exynos_meteringMode = group.findPreference(KEY_EXYNOS_METERING_MODE);
         ListPreference exynos_exposure_compensation = group.findPreference(KEY_EXYNOS_EXPOSURE_COMPENSATION);
+        ListPreference exynos_exposure_time = group.findPreference(KEY_EXYNOS_EXPOSURE_TIME);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -1922,6 +1927,11 @@ public class CameraSettings {
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION)) {
             removePreference(group, exynos_exposure_compensation.getKey());
+        }
+        if (exynos_exposure_time != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_CUR_TIME) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MIN_TIME) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MAX_TIME)) {
+            removePreference(group, exynos_exposure_time.getKey());
         }
     }
 

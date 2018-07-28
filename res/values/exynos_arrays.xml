@@ -360,5 +360,79 @@
         <item>20</item>
     </string-array>
 
+    <!-- Camera Preferences exposure time entries -->
+    <string-array name="pref_camera_exy_exposure_time_entries">
+        <item>@string/pref_camera_exy_exposure_time_entry_auto</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_24000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_16000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_12000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_8000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_6000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_4000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_3000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_2000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_1500</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_1000</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_750</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_500</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_350</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_250</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_180</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_125</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_60</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_50</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_45</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_30</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_20</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_15</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_10</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_8</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_6</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_4</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1_by_2</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_1</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_2</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_4</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_8</item>
+        <item>@string/pref_camera_exy_exposure_time_entry_10</item>
+    </string-array>
+
+    <!-- Camera Preferences exposure compensation time values -->
+    <string-array name="pref_camera_exy_exposure_time_entryvalues">
+        <item>auto</item>
+        <item>42</item>
+        <item>63</item>
+        <item>83</item>
+        <item>125</item>
+        <item>167</item>
+        <item>250</item>
+        <item>333</item>
+        <item>500</item>
+        <item>667</item>
+        <item>1000</item>
+        <item>1333</item>
+        <item>2000</item>
+        <item>2857</item>
+        <item>4000</item>
+        <item>5556</item>
+        <item>8000</item>
+        <item>16667</item>
+        <item>20000</item>
+        <item>22222</item>
+        <item>33333</item>
+        <item>50000</item>
+        <item>66667</item>
+        <item>100000</item>
+        <item>125000</item>
+        <item>166667</item>
+        <item>250000</item>
+        <item>500000</item>
+        <item>1000000</item>
+        <item>2000000</item>
+        <item>4000000</item>
+        <item>8000000</item>
+        <item>10000000</item>
+    </string-array>
+
 </resources>
 

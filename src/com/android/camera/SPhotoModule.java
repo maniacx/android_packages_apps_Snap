@@ -2913,6 +2913,18 @@ public class SPhotoModule
         return ret;
     }
 
+    private String getExposureTimeSafe() {
+        String ret = null;
+        if (CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_TIME) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_MIN_TIME) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_MAX_TIME)) {
+            ret = mPreferences.getString(
+                    CameraSettings.KEY_EXYNOS_EXPOSURE_TIME,
+                    mActivity.getString(R.string.pref_camera_exy_exposure_time_default));
+        }
+        return ret;
+    }
+
     /** This can run on a background thread, so don't do UI updates here.*/
     private void qcomUpdateCameraParametersPreference() {
         //qcom Related Parameter update
@@ -2996,6 +3008,19 @@ public class SPhotoModule
                     && (exposure_comp <= mParameters.getInt(CameraSettings.KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION))) {
                 mParameters.set(CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_COMPENSATION, exposure_comp);
             }
+        }
+
+        // Set exposure_compensation
+        String exposureTimeStr = getExposureTimeSafe();
+        if ((exposureTimeStr != null) && !exposureTimeStr.equals("auto")) {
+            int exposure_time = Integer.parseInt(exposureTimeStr);
+            Log.v(TAG, "exposure time value =" + exposure_time);
+            if((exposure_time >= mParameters.getInt(CameraSettings.KEY_EXYNOS_EXPOSURE_MIN_TIME))
+                    && (exposure_time <= mParameters.getInt(CameraSettings.KEY_EXYNOS_EXPOSURE_MAX_TIME))) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_TIME, exposure_time);
+            }
+        } else if ((exposureTimeStr != null) && exposureTimeStr.equals("auto")) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_TIME, exposureTimeStr);
         }
 
         // Set Face Recognition
