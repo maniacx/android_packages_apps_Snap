@@ -300,6 +300,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_SCENE_MODE = "pref_camera_exy_scenemode_key";
     public static final String KEY_EXYNOS_CAMERA_RT_HDR = "pref_camera_exy_rt_hdr_key";
     public static final String KEY_EXYNOS_METERING_MODE = "pref_camera_exy_metering_mode_key";
+    public static final String KEY_EXYNOS_EXPOSURE_COMPENSATION = "pref_camera_exy_exposure_compensation_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -310,6 +311,11 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_RT_HDR = "rt-hdr";
     public static final String KEY_EXYNOS_METERING = "metering";
     public static final String KEY_EXYNOS_SHOTMODE = "shot-mode";
+    public static final String KEY_EXYNOS_EXPOSURE_CUR_COMPENSATION = "exposure-compensation";
+    public static final String KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION = "max-exposure-compensation";
+    public static final String KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION = "min-exposure-compensation";
+    public static final String KEY_EXYNOS_EXPOSURE_COMPENSATION_STEP = "exposure-compensation-step";
+
     public static final String KEY_EXYNOS_SHOT_AUTO = "10";
     public static final String KEY_EXYNOS_SHOT_PRO = "34";
     public static final String KEY_EXYNOS_SHOT_VIDEO = "0";
@@ -319,7 +325,6 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_SHOT_SELECTIVE_FOCUS = "20";
     public static final String KEY_EXYNOS_SHOT_BEAUTY = "2";
     public static final String KEY_EXYNOS_SHOT_VIRTUALMODE = "29";
-
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
     private static final String KEY_EXYNOS_METERING_VALUES = "metering-values";
 // End of Exynos5Camera
@@ -1868,6 +1873,7 @@ public class CameraSettings {
         ListPreference exynos_sceneMode = group.findPreference(KEY_EXYNOS_SCENE_MODE);
         ListPreference exynos_realTimeHdr = group.findPreference(KEY_EXYNOS_CAMERA_RT_HDR);
         ListPreference exynos_meteringMode = group.findPreference(KEY_EXYNOS_METERING_MODE);
+        ListPreference exynos_exposure_compensation = group.findPreference(KEY_EXYNOS_EXPOSURE_COMPENSATION);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -1911,6 +1917,11 @@ public class CameraSettings {
             } else {
                 removePreference(group, exynos_meteringMode.getKey());
             }
+        }
+        if (exynos_exposure_compensation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_CUR_COMPENSATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION) &&
+                !CameraUtil.isSupported(mParameters, KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION)) {
+            removePreference(group, exynos_exposure_compensation.getKey());
         }
     }
 

@@ -270,5 +270,95 @@
          <item>@string/pref_camera_exy_metering_mode_value_matrix</item>
     </string-array>
 
+    <!-- Camera Preferences exposure compensation entries -->
+    <string-array name="pref_camera_exy_exposure_compensation_entries">
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln20</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln19</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln18</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln17</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln16</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln15</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln14</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln13</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln12</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln11</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln10</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln9</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln8</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln7</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln6</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln5</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln4</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln3</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln2</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_leveln1</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_level0</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp1</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp2</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp3</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp4</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp5</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp6</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp7</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp8</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp9</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp10</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp11</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp12</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp13</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp14</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp15</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp16</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp17</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp18</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp19</item>
+        <item>@string/pref_camera_exy_exposure_compensation_entry_levelp20</item>
+    </string-array>
+
+    <!-- Camera Preferences exposure compensation entries values -->
+    <string-array name="pref_camera_exy_exposure_compensation_entryvalues">
+        <item>-20</item>
+        <item>-19</item>
+        <item>-18</item>
+        <item>-17</item>
+        <item>-16</item>
+        <item>-15</item>
+        <item>-14</item>
+        <item>-13</item>
+        <item>-12</item>
+        <item>-11</item>
+        <item>-10</item>
+        <item>-9</item>
+        <item>-8</item>
+        <item>-7</item>
+        <item>-6</item>
+        <item>-5</item>
+        <item>-4</item>
+        <item>-3</item>
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
+
 </resources>
 

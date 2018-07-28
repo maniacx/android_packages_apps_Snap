@@ -175,6 +175,7 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_SELFIE_MIRROR,
                 CameraSettings.KEY_SHUTTER_SOUND,
                 CameraSettings.KEY_POWER_SHUTTER,
+                CameraSettings.KEY_EXYNOS_EXPOSURE_COMPENSATION,
                 CameraSettings.KEY_EXYNOS_SATURATION,
                 CameraSettings.KEY_EXYNOS_SHARPNESS,
                 CameraSettings.KEY_ANTIBANDING,
@@ -193,6 +194,7 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_FOCUS_TIME,
                 CameraSettings.KEY_POWER_SHUTTER,
                 CameraSettings.KEY_MAX_BRIGHTNESS,
+                CameraSettings.KEY_EXYNOS_EXPOSURE_COMPENSATION,
                 CameraSettings.KEY_EXYNOS_SATURATION,
                 CameraSettings.KEY_EXYNOS_SHARPNESS,
                 CameraSettings.KEY_ANTIBANDING,
@@ -587,6 +589,7 @@ public class SPhotoMenu extends MenuController
         }
         if ((sceneMode != null) && !sceneMode.equals("pro-mode")) {
             popup1.setPreferenceEnabled(CameraSettings.KEY_FOCUS_MODE, false);
+            popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_EXPOSURE_COMPENSATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE, false);

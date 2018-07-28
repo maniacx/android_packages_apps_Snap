@@ -2901,6 +2901,18 @@ public class SPhotoModule
         return ret;
     }
 
+    private String getExposureCompSafe() {
+        String ret = null;
+        if (CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_COMPENSATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION) &&
+                CameraUtil.isSupported(mParameters, CameraSettings.KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION)) {
+            ret = mPreferences.getString(
+                    CameraSettings.KEY_EXYNOS_EXPOSURE_COMPENSATION,
+                    mActivity.getString(R.string.pref_camera_exy_exposure_compensation_default));
+        }
+        return ret;
+    }
+
     /** This can run on a background thread, so don't do UI updates here.*/
     private void qcomUpdateCameraParametersPreference() {
         //qcom Related Parameter update
@@ -2974,6 +2986,18 @@ public class SPhotoModule
                 mParameters.set(CameraSettings.KEY_EXYNOS_CUR_SHARPNESS, sharpness);
             }
         }
+
+        // Set exposure_compensation
+        String exposureCompStr = getExposureCompSafe();
+        if (exposureCompStr != null) {
+            int exposure_comp = Integer.parseInt(exposureCompStr);
+            Log.v(TAG, "exposure comp value =" + exposure_comp);
+            if((exposure_comp >= mParameters.getInt(CameraSettings.KEY_EXYNOS_EXPOSURE_MIN_COMPENSATION))
+                    && (exposure_comp <= mParameters.getInt(CameraSettings.KEY_EXYNOS_EXPOSURE_MAX_COMPENSATION))) {
+                mParameters.set(CameraSettings.KEY_EXYNOS_EXPOSURE_CUR_COMPENSATION, exposure_comp);
+            }
+        }
+
         // Set Face Recognition
         String faceRC = mPreferences.getString(
                 CameraSettings.KEY_FACE_RECOGNITION,

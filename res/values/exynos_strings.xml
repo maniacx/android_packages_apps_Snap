@@ -82,6 +82,51 @@
     <string name="pref_camera_exy_metering_mode_value_center" translatable="false">center</string>
     <string name="pref_camera_exy_metering_mode_value_matrix" translatable="false">matrix</string>
 
+    <!-- Settings screen, exposure compensation strings -->
+    <string name="pref_exy_exposure_compensation_title" translatable="false">Exposure Compensation</string>
+    <string name="pref_camera_exy_exposure_compensation_default" translatable="false">0</string>
+
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln20">-2.0</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln19">-1.9</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln18">-1.8</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln17">-1.7</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln16">-1.6</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln15">-1.5</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln14">-1.4</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln13">-1.3</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln12">-1.2</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln11">-1.1</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln10">-1.0</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln9">-0.9</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln8">-0.8</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln7">-0.7</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln6">-0.6</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln5">-0.5</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln4">-0.4</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln3">-0.3</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln2">-0.2</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_leveln1">-0.1</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_level0">0</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp1">+0.1</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp2">+0.2</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp3">+0.3</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp4">+0.4</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp5">+0.5</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp6">+0.6</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp7">+0.7</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp8">+0.8</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp9">+0.9</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp10">+1.0</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp11">+1.1</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp12">+1.2</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp13">+1.3</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp14">+1.4</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp15">+1.5</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp16">+1.6</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp17">+1.7</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp18">+1.8</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp19">+1.9</string>
+    <string name="pref_camera_exy_exposure_compensation_entry_levelp20">+2.0</string>
 
 </resources>
 
