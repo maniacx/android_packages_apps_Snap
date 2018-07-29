@@ -3063,6 +3063,16 @@ public class SPhotoModule
             mParameters.set(CameraSettings.KEY_EXYNOS_CUR_ISO, iso);
         }
 
+        // Set whitebalance mode
+        String whiteBalance = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_WHITE_BALANCE,
+                mActivity.getString(R.string.pref_camera_exy_white_balance_default));
+        if (CameraUtil.isSupported(whiteBalance,
+                CameraSettings.getWhitebalanceModes(mParameters))) {
+            Log.v(TAG, "white balance value =" + whiteBalance);
+            mParameters.set(CameraSettings.KEY_EXYNOS_CUR_WHITE_BALANCE, whiteBalance);
+        }
+
         // Set face detetction parameter.
         // clear override to re-enable setting if true portrait is off.
         mActivity.runOnUiThread(new Runnable() {

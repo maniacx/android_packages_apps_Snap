@@ -303,6 +303,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_EXPOSURE_COMPENSATION = "pref_camera_exy_exposure_compensation_key";
     public static final String KEY_EXYNOS_EXPOSURE_TIME = "pref_camera_exy_exposure_time_key";
     public static final String KEY_EXYNOS_ISO = "pref_camera_exy_iso_key";
+    public static final String KEY_EXYNOS_WHITE_BALANCE = "pref_camera_exy_whitebalance_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -321,6 +322,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_EXPOSURE_MAX_TIME = "max-exposure-time";
     public static final String KEY_EXYNOS_EXPOSURE_MIN_TIME = "min-exposure-time";
     public static final String KEY_EXYNOS_CUR_ISO = "iso";
+    public static final String KEY_EXYNOS_CUR_WHITE_BALANCE = "whitebalance";
 
     public static final String KEY_EXYNOS_SHOT_AUTO = "10";
     public static final String KEY_EXYNOS_SHOT_PRO = "34";
@@ -335,6 +337,7 @@ public class CameraSettings {
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
     private static final String KEY_EXYNOS_METERING_VALUES = "metering-values";
     private static final String KEY_EXYNOS_ISO_VALUES = "iso-values";
+    private static final String KEY_EXYNOS_WHITE_BALANCE_VALUES = "whitebalance-values";
 // End of Exynos5Camera
 
     private static final String TAG = "CameraSettings";
@@ -1884,6 +1887,7 @@ public class CameraSettings {
         ListPreference exynos_exposure_compensation = group.findPreference(KEY_EXYNOS_EXPOSURE_COMPENSATION);
         ListPreference exynos_exposure_time = group.findPreference(KEY_EXYNOS_EXPOSURE_TIME);
         ListPreference exynos_iso = group.findPreference(KEY_EXYNOS_ISO);
+        ListPreference exynos_white_balance = group.findPreference(KEY_EXYNOS_WHITE_BALANCE);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -1946,6 +1950,14 @@ public class CameraSettings {
                 removePreference(group, exynos_iso.getKey());
             }
         }
+        if (exynos_white_balance != null) {
+            if (getWhitebalanceModes(mParameters) != null) {
+                filterUnsupportedOptions(group,
+                    exynos_white_balance, getWhitebalanceModes(mParameters));
+            } else {
+                removePreference(group, exynos_white_balance.getKey());
+            }
+        }
     }
 
     public static List<String> getSupportedRTHdrModes(Parameters params) {
@@ -1965,6 +1977,13 @@ public class CameraSettings {
     }
     public static List<String> getIsoModes(Parameters params) {
         String str = params.get(KEY_EXYNOS_ISO_VALUES);
+        if (str == null) {
+            return null;
+        }
+        return split(str);
+    }
+    public static List<String> getWhitebalanceModes(Parameters params) {
+        String str = params.get(KEY_EXYNOS_WHITE_BALANCE_VALUES);
         if (str == null) {
             return null;
         }
