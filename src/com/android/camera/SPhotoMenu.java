@@ -175,6 +175,7 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_SELFIE_MIRROR,
                 CameraSettings.KEY_SHUTTER_SOUND,
                 CameraSettings.KEY_POWER_SHUTTER,
+                CameraSettings.KEY_MAX_BRIGHTNESS,
                 CameraSettings.KEY_EXYNOS_ISO,
                 CameraSettings.KEY_EXYNOS_EXPOSURE_COMPENSATION,
                 CameraSettings.KEY_EXYNOS_EXPOSURE_TIME,
