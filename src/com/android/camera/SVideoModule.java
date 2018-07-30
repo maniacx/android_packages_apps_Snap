@@ -974,7 +974,7 @@ public class SVideoModule implements CameraModule,
                     R.string.pref_video_quality_default);
             if (!defaultQuality.equals("") &&
                     CameraUtil.isSupported(defaultQuality,
-                            CameraSettings.getSupportedVideoQualities(
+                            CameraSettings.getSupportedExynosVideoQualities(
                                                     mCameraId, mParameters))){
                 videoQuality = defaultQuality;
             } else {

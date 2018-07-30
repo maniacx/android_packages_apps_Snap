@@ -304,6 +304,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_EXPOSURE_TIME = "pref_camera_exy_exposure_time_key";
     public static final String KEY_EXYNOS_ISO = "pref_camera_exy_iso_key";
     public static final String KEY_EXYNOS_WHITE_BALANCE = "pref_camera_exy_whitebalance_key";
+    public static final String KEY_EXYNOS_VIDEO_QUALITY = "pref_video_exy_quality_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -1888,6 +1889,7 @@ public class CameraSettings {
         ListPreference exynos_exposure_time = group.findPreference(KEY_EXYNOS_EXPOSURE_TIME);
         ListPreference exynos_iso = group.findPreference(KEY_EXYNOS_ISO);
         ListPreference exynos_white_balance = group.findPreference(KEY_EXYNOS_WHITE_BALANCE);
+        ListPreference exynos_videoQuality = group.findPreference(KEY_EXYNOS_VIDEO_QUALITY);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -1958,6 +1960,10 @@ public class CameraSettings {
                 removePreference(group, exynos_white_balance.getKey());
             }
         }
+        if (exynos_videoQuality != null) {
+            filterUnsupportedOptions(group, exynos_videoQuality, getSupportedExynosVideoQualities(
+                    mCameraId, mParameters));
+        }
     }
 
     public static List<String> getSupportedRTHdrModes(Parameters params) {
@@ -1988,5 +1994,32 @@ public class CameraSettings {
             return null;
         }
         return split(str);
+    }
+    public static ArrayList<String> getSupportedExynosVideoQualities(int cameraId,
+            Parameters parameters) {
+        ArrayList<String> supported = new ArrayList<String>();
+        List<String> temp;
+        // video-size not specified in parameter list,
+        // assume all profiles in media_profiles are supported.
+        temp = new ArrayList<String>();
+        temp.add("4096x2160");
+        temp.add("3840x2160");
+        temp.add("1920x1080");
+        temp.add("1280x720");
+        temp.add("720x480");
+        temp.add("640x480");
+        temp.add("352x288");
+        temp.add("320x240");
+        temp.add("176x144");
+
+        for (String videoSize : temp) {
+            if (VIDEO_QUALITY_TABLE.containsKey(videoSize)) {
+                int profile = VIDEO_QUALITY_TABLE.get(videoSize);
+                if (CamcorderProfile.hasProfile(cameraId, profile)) {
+                    supported.add(videoSize);
+                }
+            }
+        }
+        return supported;
     }
 }
