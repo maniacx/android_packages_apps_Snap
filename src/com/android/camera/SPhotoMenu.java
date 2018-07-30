@@ -170,8 +170,6 @@ public class SPhotoMenu extends MenuController
                 CameraSettings.KEY_TIMER,
                 CameraSettings.KEY_CAMERA_SAVEPATH,
                 CameraSettings.KEY_LONGSHOT,
-                CameraSettings.KEY_FACE_DETECTION,
-                CameraSettings.KEY_FOCUS_TIME,
                 CameraSettings.KEY_SELFIE_MIRROR,
                 CameraSettings.KEY_SHUTTER_SOUND,
                 CameraSettings.KEY_POWER_SHUTTER,
