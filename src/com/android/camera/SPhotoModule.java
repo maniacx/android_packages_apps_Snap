@@ -3386,7 +3386,6 @@ public class SPhotoModule
 
 
         if(mCameraId == 1) {
-                mSceneMode = Parameters.SCENE_MODE_AUTO;
                 mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_BEAUTY);
         } else if (mSceneMode.equals("pro-mode")) {
                 mSceneMode = Parameters.SCENE_MODE_AUTO;

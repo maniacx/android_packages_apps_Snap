@@ -1918,7 +1918,14 @@ public class CameraSettings {
 
         if (exynos_sceneMode != null) {
             String[] sceneModes = mContext.getResources().getStringArray(R.array.supported_scenemode);
-            List<String> supportedSceneModes = Arrays.asList(sceneModes);
+            List<String> supportedSceneModes;
+            supportedSceneModes = new ArrayList<String>();
+            if (mCameraId == 1) {
+                supportedSceneModes.add("auto");
+                supportedSceneModes.add("portrait");
+            } else {
+                supportedSceneModes = Arrays.asList(sceneModes);
+            }
             filterUnsupportedOptions(group, exynos_sceneMode, supportedSceneModes);
         }
 
