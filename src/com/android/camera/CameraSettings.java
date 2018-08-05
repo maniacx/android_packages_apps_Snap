@@ -305,6 +305,10 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_ISO = "pref_camera_exy_iso_key";
     public static final String KEY_EXYNOS_WHITE_BALANCE = "pref_camera_exy_whitebalance_key";
     public static final String KEY_EXYNOS_VIDEO_QUALITY = "pref_video_exy_quality_key";
+    public static final String KEY_EXYNOS_HIGH_FRAME_RATE = "pref_camera_exy_high_framerate_key";
+    public static final String KEY_EXYNOS_SLOW_MOTION = "pref_camera_exy_slow_motion_key";
+    public static final String KEY_EXYNOS_DIS = "pref_camera_exy_dis_key";
+    public static final String KEY_EXYNOS_VIDEO_HDR = "pref_camera_exy_video_hdr_key";
 
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
@@ -324,7 +328,6 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_EXPOSURE_MIN_TIME = "min-exposure-time";
     public static final String KEY_EXYNOS_CUR_ISO = "iso";
     public static final String KEY_EXYNOS_CUR_WHITE_BALANCE = "whitebalance";
-
     public static final String KEY_EXYNOS_SHOT_AUTO = "10";
     public static final String KEY_EXYNOS_SHOT_PRO = "34";
     public static final String KEY_EXYNOS_SHOT_VIDEO = "0";
@@ -334,6 +337,17 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_SHOT_SELECTIVE_FOCUS = "20";
     public static final String KEY_EXYNOS_SHOT_BEAUTY = "2";
     public static final String KEY_EXYNOS_SHOT_VIRTUALMODE = "29";
+    public static final String KEY_EXYNOS_FPS_10_30 = "10000,30000";
+    public static final String KEY_EXYNOS_FPS_30_30 = "30000,30000";
+    public static final String KEY_EXYNOS_FPS_60_60 = "60000,60000";
+    public static final String KEY_EXYNOS_FPS_120_120 = "120000,120000";
+    public static final String KEY_EXYNOS_VDIS_MODE = "sw-vdis";
+    public static final String KEY_EXYNOS_FAST_FPS_MODE = "fast-fps-mode";
+    public static final String KEY_EXYNOS_PREVIEW_FPS_RANGE = "preview-fps-range";
+    public static final String KEY_EXYNOS_VIDEO_STABILIZATION = "video-stabilization";
+    public static final String KEY_EXYNOS_PHASE_AF = "phase-af";
+    public static final String KEY_EXYNOS_DYNAMIC_RANGE_CONTROL = "dynamic-range-control";
+    public static final String KEY_EXYNOS_OIS = "ois";
 
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
     private static final String KEY_EXYNOS_METERING_VALUES = "metering-values";
@@ -1890,6 +1904,9 @@ public class CameraSettings {
         ListPreference exynos_iso = group.findPreference(KEY_EXYNOS_ISO);
         ListPreference exynos_white_balance = group.findPreference(KEY_EXYNOS_WHITE_BALANCE);
         ListPreference exynos_videoQuality = group.findPreference(KEY_EXYNOS_VIDEO_QUALITY);
+        ListPreference exynos_highFrameRate = group.findPreference(KEY_EXYNOS_HIGH_FRAME_RATE);
+        ListPreference exynos_sloMotion = group.findPreference(KEY_EXYNOS_SLOW_MOTION);
+        ListPreference exynos_disMode = group.findPreference(KEY_EXYNOS_DIS);
 
         if (exynos_saturation != null && !CameraUtil.isSupported(mParameters, KEY_EXYNOS_CUR_SATURATION) &&
                 !CameraUtil.isSupported(mParameters, KEY_EXYNOS_MIN_SATURATION) &&
@@ -2028,5 +2045,20 @@ public class CameraSettings {
             }
         }
         return supported;
+    }
+    public static String getSupportedExynosHighestVideoQuality(
+            Context context, int cameraId, Parameters parameters) {
+        // When launching the camera app first time, we will set the video quality
+        // to the first one (i.e. highest quality) in the supported list
+        List<String> supported = getSupportedExynosVideoQualities(cameraId, parameters);
+        assert (supported != null) : "No supported video quality is found";
+        for (String candidate : context.getResources().getStringArray(
+                R.array.pref_video_quality_entryvalues)) {
+            if (supported.indexOf(candidate) >= 0) {
+                return candidate;
+            }
+        }
+        Log.w(TAG, "No supported video size matches, using the first reported size");
+        return supported.get(0);
     }
 }

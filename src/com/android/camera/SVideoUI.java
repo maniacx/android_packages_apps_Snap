@@ -760,6 +760,34 @@ public class SVideoUI implements PieRenderer.PieListener,
             return false;
     }
 
+    public boolean is1080pEnabled() {
+        if(mController != null)
+            return ((SVideoModule)mController).is1080pEnabled();
+        else
+            return false;
+    }
+
+    public boolean is720pEnabled() {
+        if(mController != null)
+            return ((SVideoModule)mController).is720pEnabled();
+        else
+            return false;
+    }
+
+    public boolean isHighFPSmode() {
+        if(mController != null)
+            return ((SVideoModule)mController).isHighFPSmode();
+        else
+            return false;
+    }
+
+    public boolean isDISmode() {
+        if(mController != null)
+            return ((SVideoModule)mController).isDISmode();
+        else
+            return false;
+    }
+
     private void popupDismissed() {
         mPopup = null;
     }

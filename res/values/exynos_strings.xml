@@ -20,6 +20,32 @@
 -->
 
 <resources>
+    <!-- Toast for cannot use HDR in Video Stabilization -->
+    <string name="toast_video_dis_disable_vhdr">Cannot use HDR in Stabilization mode. HDR will be disabled.</string>
+
+    <!-- Toast for restarting camera -->
+    <string name="toast_restarting_info">Restart Using switch camera</string>
+
+    <!-- Toast for cannot use Video Stabilization in 1080p only -->
+    <string name="toast_video_enable_dis_1080p">Stabilization works in 1080p only. Stabilization will be disabled</string>
+
+    <!-- Toast for cannot use Video Stabilization in 4K modes -->
+    <string name="toast_video_4k_disable_IS">Cannot use Stabilization in 4K. Stabilization will be disabled</string>
+
+    <!-- Toast for cannot use HDR in 4K modes -->
+    <string name="toast_video_4k_disable_vhdr">Cannot use HDR in 4K. HDR will be disabled.</string>
+
+    <!-- Toast for cannot use Video Stabilization in Slow Motion -->
+    <string name="toast_videohfr_disable_IS">Cannot use Stabilization in Slow Motion. Stabilization will be disabled.</string>
+
+    <!-- Toast for cannot use HDR in Slow Motion -->
+    <string name="toast_videohfr_disable_vhdr">Cannot use HDR in Slow Motion. HDR will be disabled.</string>
+
+    <!-- Toast for cannot use Video Stabilization in 60fps -->
+    <string name="toast_video_ffps_disable_IS">Cannot use Stabilization in 60fps. Stabilization will be disabled.</string>
+
+    <!-- Toast for cannot use HDR in 60fps -->
+    <string name="videoffps_disable_vhdr">Cannot use HDR in 60fps. HDR will be disabled.</string>
 
     <!-- Auto strings -->
     <string name="setting_auto">Auto</string>
@@ -185,6 +211,20 @@
     <string name="pref_camera_exy_white_balance_entry_fluorescent">Fluorescent</string>
     <string name="pref_camera_exy_white_balance_entry_daylight">Daylight</string>
     <string name="pref_camera_exy_white_balance_entry_cloudy">Cloudy</string>
+
+    <!-- Settings screen for video high framerate mode -->
+    <string name="pref_camera_exy_high_framerate_default" translatable="false">off</string>
+    <string name="pref_camera_exy_high_framerate_title" translatable="false">60 FPS (1080p only)</string>
+
+    <!-- Settings screen for video slow motion mode -->
+    <string name="pref_camera_exy_slow_motion_default" translatable="false">off</string>
+    <string name="pref_camera_exy_slow_motion_title" translatable="false">Slow motion (720p only)</string>
+
+    <!-- Settings screen for dis mode -->
+    <string name="pref_camera_exy_dis_default" translatable="false">off</string>
+
+    <!-- Settings screen for video hdr mode -->
+    <string name="pref_camera_exy_video_hdr_default" translatable="false">off</string>
 
 </resources>
 

@@ -108,13 +108,15 @@ public class SVideoMenu extends MenuController
         // settings popup
         mOtherKeys1 = new String[] {
                 CameraSettings.KEY_VIDEOCAMERA_FLASH_MODE,
-                CameraSettings.KEY_RECORD_LOCATION,
                 CameraSettings.KEY_EXYNOS_VIDEO_QUALITY,
-                CameraSettings.KEY_CAMERA_SAVEPATH,
-                CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE,
-                CameraSettings.KEY_DIS,
+                CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+                CameraSettings.KEY_EXYNOS_DIS,
+                CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                CameraSettings.KEY_MAX_BRIGHTNESS,
                 CameraSettings.KEY_POWER_SHUTTER,
-                CameraSettings.KEY_MAX_BRIGHTNESS
+                CameraSettings.KEY_RECORD_LOCATION,
+                CameraSettings.KEY_CAMERA_SAVEPATH
         };
         mOtherKeys2 = new String[] {
                 CameraSettings.KEY_VIDEOCAMERA_FLASH_MODE,
@@ -127,16 +129,16 @@ public class SVideoMenu extends MenuController
                 CameraSettings.KEY_WHITE_BALANCE,
                 CameraSettings.KEY_VIDEOCAMERA_FOCUS_MODE,
                 CameraSettings.KEY_VIDEOCAMERA_FOCUS_TIME,
-                CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE,
+                CameraSettings.KEY_EXYNOS_SLOW_MOTION,
                 CameraSettings.KEY_POWER_SHUTTER,
                 CameraSettings.KEY_MAX_BRIGHTNESS,
                 CameraSettings.KEY_SEE_MORE,
-                CameraSettings.KEY_DIS,
+                CameraSettings.KEY_EXYNOS_DIS,
                 CameraSettings.KEY_VIDEO_EFFECT,
                 CameraSettings.KEY_VIDEO_TIME_LAPSE_FRAME_INTERVAL,
                 CameraSettings.KEY_VIDEO_ENCODER,
                 CameraSettings.KEY_AUDIO_ENCODER,
-                CameraSettings.KEY_VIDEO_HDR,
+                CameraSettings.KEY_EXYNOS_VIDEO_HDR,
                 CameraSettings.KEY_ANTIBANDING,
                 CameraSettings.KEY_POWER_MODE,
                 CameraSettings.KEY_VIDEO_ROTATION,
@@ -684,56 +686,113 @@ public class SVideoMenu extends MenuController
     }
     private void overrideMenuFor4K() {
         if(mUI.is4KEnabled()) {
-            mListMenu.setPreferenceEnabled(
-                     CameraSettings.KEY_DIS,false);
-            mListMenu.overrideSettings(
-                     CameraSettings.KEY_DIS, "disable");
 
+            ListPreference dismode =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_DIS);
+            if (dismode != null && !"off".equals(dismode.getValue())) {
+                mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_DIS,
+                           mActivity.getString(R.string.pref_camera_exy_dis_default));
+            }
             mListMenu.setPreferenceEnabled(
-                    CameraSettings.KEY_SEE_MORE, false);
-            mListMenu.overrideSettings(
-                    CameraSettings.KEY_SEE_MORE, mActivity.getString(R.string.pref_camera_see_more_value_off));
-        }
-    }
+                     CameraSettings.KEY_EXYNOS_DIS,false);
 
-    private void overrideMenuForVideoHighFrameRate() {
-        ListPreference disPref = mPreferenceGroup
-                .findPreference(CameraSettings.KEY_DIS);
-        ListPreference frameIntervalPref = mPreferenceGroup
-                .findPreference(CameraSettings.KEY_VIDEO_TIME_LAPSE_FRAME_INTERVAL);
-        ListPreference videoHDRPref = mPreferenceGroup
-                .findPreference(CameraSettings.KEY_VIDEO_HDR);
-        String disMode = disPref == null ? "disable" : disPref.getValue();
-        String videoHDR = videoHDRPref == null ? "off" : videoHDRPref.getValue();
-        String frameIntervalStr = frameIntervalPref.getValue();
-        int timeLapseInterval = Integer.parseInt(frameIntervalStr);
-        int PERSIST_EIS_MAX_FPS =  android.os.SystemProperties
-                .getInt("persist.camcorder.eis.maxfps", 30);
-        ListPreference hfrPref = mPreferenceGroup
-                .findPreference(CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE);
-        String highFrameRate;
-        if (hfrPref == null) {
-            //If hfrPref is null, use whitespace instead.
-            highFrameRate = "     ";
+            ListPreference videohdr =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_VIDEO_HDR);
+            if (videohdr != null && !"off".equals(videohdr.getValue())) {
+               mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                            mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+            }
+            mListMenu.setPreferenceEnabled(
+                     CameraSettings.KEY_EXYNOS_VIDEO_HDR,false);
+
+            ListPreference highframerate =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE);
+            if (highframerate != null && !"off".equals(highframerate.getValue())) {
+               mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                            mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
+            }
+            mListMenu.setPreferenceEnabled(
+                     CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,false);
+
+            ListPreference slowmotion =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION);
+            if (slowmotion != null && !"off".equals(slowmotion.getValue())) {
+               mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+                            mActivity.getString(R.string.pref_camera_exy_slow_motion_default));
+            }
+            mListMenu.setPreferenceEnabled(
+                     CameraSettings.KEY_EXYNOS_SLOW_MOTION,false);
+
         } else {
-            highFrameRate = hfrPref.getValue();
-        }
-        boolean isHFR = "hfr".equals(highFrameRate.substring(0,3));
-        boolean isHSR = "hsr".equals(highFrameRate.substring(0,3));
-        int rate = 0;
-        if ( isHFR || isHSR ) {
-            String hfrRate = highFrameRate.substring(3);
-            rate = Integer.parseInt(hfrRate);
-        }
+            if(!mUI.is1080pEnabled()) {
+                ListPreference highframerate =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE);
+                if (highframerate != null && !"off".equals(highframerate.getValue())) {
+                   mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                                mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,false);
 
-        if ((disMode.equals("enable") && rate > PERSIST_EIS_MAX_FPS)
-                || !videoHDR.equals("off")
-                || timeLapseInterval != 0) {
-            mListMenu.setPreferenceEnabled(CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE, false);
-            RotateTextToast.makeText(mActivity, R.string.error_app_unsupported_hfr_selection,
-                    Toast.LENGTH_LONG).show();
-        }
+                ListPreference dismode =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_DIS);
+                if (dismode != null && !"off".equals(dismode.getValue())) {
+                    mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_DIS,
+                               mActivity.getString(R.string.pref_camera_exy_dis_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_DIS,false);
+            }
+            if(!mUI.is720pEnabled()) {
+                ListPreference slowmotion =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION);
+                if (slowmotion != null && !"off".equals(slowmotion.getValue())) {
+                   mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+                                mActivity.getString(R.string.pref_camera_exy_slow_motion_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_SLOW_MOTION,false);
+            }
+            if(mUI.isHighFPSmode()) {
+                ListPreference dismode =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_DIS);
+                if (dismode != null && !"off".equals(dismode.getValue())) {
+                    mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_DIS,
+                               mActivity.getString(R.string.pref_camera_exy_dis_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_DIS,false);
 
+                ListPreference videohdr =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_VIDEO_HDR);
+                if (videohdr != null && !"off".equals(videohdr.getValue())) {
+                   mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_VIDEO_HDR,false);
+            }
+            if(mUI.isDISmode()) {
+                ListPreference videohdr =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_VIDEO_HDR);
+                if (videohdr != null && !"off".equals(videohdr.getValue())) {
+                   mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_VIDEO_HDR,false);
+            }
+        }
     }
 
     @Override
@@ -762,14 +821,12 @@ public class SVideoMenu extends MenuController
                 R.layout.list_menu, null, false);
         popup1.setSettingChangedListener(this);
         String[] keys = mOtherKeys1;
-        if (mActivity.isDeveloperMenuEnabled())
-            keys = mOtherKeys2;
+
         popup1.initialize(mPreferenceGroup, keys);
 
         mListMenu = popup1;
 
         overridePreferenceAccessibility();
-        overrideMenuForVideoHighFrameRate();
     }
 
     public void popupDismissed(boolean topPopupOnly) {
@@ -885,14 +942,14 @@ public class SVideoMenu extends MenuController
         if (notSame(pref, CameraSettings.KEY_VIDEO_TIME_LAPSE_FRAME_INTERVAL,
                 mActivity.getString(R.string.pref_video_time_lapse_frame_interval_default))) {
             ListPreference hfrPref =
-                    mPreferenceGroup.findPreference(CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE);
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION);
             if (hfrPref != null && !"off".equals(hfrPref.getValue())) {
                 RotateTextToast.makeText(mActivity, R.string.error_app_unsupported_hfr_selection,
                         Toast.LENGTH_LONG).show();
             }
-            setPreference(CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE, "off");
+            setPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION, "off");
         }
-        if (notSame(pref, CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE, "off")) {
+        if (notSame(pref, CameraSettings.KEY_EXYNOS_SLOW_MOTION, "off")) {
             String defaultValue =
                     mActivity.getString(R.string.pref_video_time_lapse_frame_interval_default);
             ListPreference lapsePref = mPreferenceGroup

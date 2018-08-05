@@ -220,6 +220,8 @@ public class SVideoModule implements CameraModule,
 
     //settings, which if enabled, need to turn off low power mode
     private boolean mIsFlipEnabled = false;
+    private boolean mIsHighFrameRateEnabled = false;
+    private boolean mIsSlowSpeedEnabled = false;
     private boolean mIsDISEnabled = false;
 
     // The preview window is on focus
@@ -362,6 +364,7 @@ public class SVideoModule implements CameraModule,
     private int mVideoEncoder;
     private int mAudioEncoder;
     private boolean mRestartPreview = false;
+    private boolean mRestartCam = false;
     private int videoWidth;
     private int videoHeight;
     boolean mUnsupportedResolution = false;
@@ -967,7 +970,7 @@ public class SVideoModule implements CameraModule,
     private void readVideoPreferences() {
         // The preference stores values from ListPreference and is thus string type for all values.
         // We need to convert it to int manually.
-        String videoQuality = mPreferences.getString(CameraSettings.KEY_VIDEO_QUALITY, null);
+        String videoQuality = mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_QUALITY, null);
         if (videoQuality == null || (videoQuality.length() < 3 && !videoQuality.contains("x"))) {
             mParameters = mCameraDevice.getParameters();
             String defaultQuality = mActivity.getResources().getString(
@@ -979,10 +982,10 @@ public class SVideoModule implements CameraModule,
                 videoQuality = defaultQuality;
             } else {
                 // check for highest quality supported
-                videoQuality = CameraSettings.getSupportedHighestVideoQuality(
+                videoQuality = CameraSettings.getSupportedExynosHighestVideoQuality(
                         mActivity, mCameraId, mParameters);
             }
-            mPreferences.edit().putString(CameraSettings.KEY_VIDEO_QUALITY, videoQuality).apply();
+            mPreferences.edit().putString(CameraSettings.KEY_EXYNOS_VIDEO_QUALITY, videoQuality).apply();
         }
 
         int quality = CameraSettings.VIDEO_QUALITY_TABLE.get(videoQuality);
@@ -1006,27 +1009,9 @@ public class SVideoModule implements CameraModule,
         mTimeBetweenTimeLapseFrameCaptureMs = Integer.parseInt(frameIntervalStr);
         mCaptureTimeLapse = (mTimeBetweenTimeLapseFrameCaptureMs != 0);
 
-        int hfrRate = 0;
-        String highFrameRate = mPreferences.getString(
-            CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE,
-            mActivity. getString(R.string.pref_camera_hfr_default));
-        if (("hfr".equals(highFrameRate.substring(0,3))) ||
-                ("hsr".equals(highFrameRate.substring(0,3)))) {
-            String rate = highFrameRate.substring(3);
-            Log.i(TAG,"HFR :"  + highFrameRate + " : rate = " + rate);
-            try {
-                hfrRate = Integer.parseInt(rate);
-            } catch (NumberFormatException nfe) {
-                Log.e(TAG, "Invalid hfr rate " + rate);
-            }
-        }
-
         int mappedQuality = quality;
         if (mCaptureTimeLapse) {
             mappedQuality = CameraSettings.getTimeLapseQualityFor(quality);
-        } else if (hfrRate > 0) {
-            mappedQuality = CameraSettings.getHighSpeedQualityFor(quality);
-            Log.i(TAG,"NOTE: HighSpeed quality (" + mappedQuality + ") for (" + quality + ")");
         }
 
         if (CamcorderProfile.hasProfile(mCameraId, mappedQuality)) {
@@ -1058,20 +1043,34 @@ public class SVideoModule implements CameraModule,
        }
     }
 
-    private boolean is1080pEnabled() {
-       if (mProfile.quality == CamcorderProfile.QUALITY_1080P) {
+    public boolean is1080pEnabled() {
+       if (mProfile.quality == CamcorderProfile.QUALITY_1080P||
+           mProfile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_1080P) {
            return true;
        } else {
            return false;
        }
     }
 
-    private boolean is720pEnabled() {
-       if (mProfile.quality == CamcorderProfile.QUALITY_720P) {
+    public boolean is720pEnabled() {
+       if (mProfile.quality == CamcorderProfile.QUALITY_720P||
+           mProfile.quality == CamcorderProfile.QUALITY_HIGH_SPEED_720P) {
            return true;
        } else {
            return false;
        }
+    }
+
+    public boolean isHighFPSmode() {
+       if (mIsHighFrameRateEnabled == true || mIsSlowSpeedEnabled == true) {
+           return true;
+       } else {
+           return false;
+       }
+    }
+
+    public boolean isDISmode() {
+           return mIsDISEnabled;
     }
 
     private boolean isSessionSupportedByEncoder(int w, int h, int fps) {
@@ -1100,56 +1099,13 @@ public class SVideoModule implements CameraModule,
         return false;
     }
 
-    boolean isHFREnabled(int videoWidth, int videoHeight) {
-        if ((null == mPreferences) || (null == mParameters)) {
-            return false;
-        }
-
-        String HighFrameRate = mPreferences.getString(
-                CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE,
-                mActivity. getString(R.string.pref_camera_hfr_default));
-
-        if(!("off".equals(HighFrameRate))) {
-            Size size = null;
-            try {
-                if (isSupported(HighFrameRate.substring(3),
-                        ParametersWrapper.getSupportedVideoHighFrameRateModes(mParameters))) {
-                    int index = ParametersWrapper.
-                            getSupportedVideoHighFrameRateModes(mParameters).indexOf(
-                            HighFrameRate.substring(3));
-                    size = ParametersWrapper.getSupportedHfrSizes(mParameters).get(index);
-                } else {
-                    return false;
-                }
-            } catch (NullPointerException e) {
-                return false;
-            } catch (IndexOutOfBoundsException e) {
-                return false;
-            }
-
-            if (size != null) {
-                if (videoWidth > size.width || videoHeight > size.height) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            int hfrFps = Integer.parseInt(HighFrameRate.substring(3));
-            return isSessionSupportedByEncoder(videoWidth, videoHeight, hfrFps);
-        }
-
-        return false;
-    }
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void getDesiredPreviewSize() {
         if (mCameraDevice == null) {
             return;
         }
         mParameters = mCameraDevice.getParameters();
-        if (mParameters.getSupportedVideoSizes() == null ||
-                isHFREnabled(mProfile.videoFrameWidth, mProfile.videoFrameHeight)) {
+        if (mParameters.getSupportedVideoSizes() == null) {
             mDesiredPreviewWidth = mProfile.videoFrameWidth;
             mDesiredPreviewHeight = mProfile.videoFrameHeight;
         } else { // Driver supports separates outputs for preview and video.
@@ -1721,20 +1677,12 @@ public class SVideoModule implements CameraModule,
         mCameraDevice.unlock();
         mMediaRecorder.setCamera(mCameraDevice.getCamera());
 
-        String hfr = ParametersWrapper.getVideoHighFrameRate(mParameters);
-        String hsr =  mParameters.get(CameraSettings.KEY_VIDEO_HSR);
-        Log.i(TAG,"NOTE: hfr = " + hfr + " : hsr = " + hsr);
-
         int captureRate = 0;
-        boolean isHFR = (hfr != null && !hfr.equals("off"));
-        boolean isHSR = (hsr != null && !hsr.equals("off"));
 
-        try {
-            captureRate = isHFR ? Integer.parseInt(hfr) :
-                    isHSR ? Integer.parseInt(hsr) : 0;
-        } catch (NumberFormatException nfe) {
-            Log.e(TAG, "Invalid hfr(" + hfr + ") or hsr(" + hsr + ")");
-        }
+        String slowMotionDisable = mActivity.getString(R.string.pref_camera_exy_slow_motion_default);
+        boolean isSlowMotion = (!slowMotionDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_SLOW_MOTION, slowMotionDisable)));
+        captureRate = isSlowMotion ? 120 : 0;        
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
@@ -1743,27 +1691,15 @@ public class SVideoModule implements CameraModule,
         mProfile.duration = mMaxVideoDurationInMs;
 
         if ((mProfile.audioCodec == MediaRecorder.AudioEncoder.AMR_NB) &&
-            !mCaptureTimeLapse && !isHFR) {
+            !mCaptureTimeLapse && !isSlowMotion) {
             mProfile.fileFormat = MediaRecorder.OutputFormat.THREE_GPP;
         }
         // Set params individually for HFR case, as we do not want to encode audio
-        if ((isHFR || isHSR) && captureRate > 0) {
-            if (isHSR) {
-                Log.i(TAG, "Enabling audio for HSR");
-                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-            }
+        if (isSlowMotion && captureRate > 0) {
             mMediaRecorder.setOutputFormat(mProfile.fileFormat);
             mMediaRecorder.setVideoFrameRate(mProfile.videoFrameRate);
-            mMediaRecorder.setVideoEncodingBitRate(mProfile.videoBitRate *
-                                                ((isHSR ? captureRate : 30) / 30));
+            mMediaRecorder.setVideoEncodingBitRate(mProfile.videoBitRate);
             mMediaRecorder.setVideoEncoder(mProfile.videoCodec);
-            if (isHSR) {
-                Log.i(TAG, "Configuring audio for HSR");
-                mMediaRecorder.setAudioEncodingBitRate(mProfile.audioBitRate);
-                mMediaRecorder.setAudioChannels(mProfile.audioChannels);
-                mMediaRecorder.setAudioSamplingRate(mProfile.audioSampleRate);
-                mMediaRecorder.setAudioEncoder(mProfile.audioCodec);
-            }
         } else {
             if (!mCaptureTimeLapse) {
                 mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
@@ -1781,10 +1717,8 @@ public class SVideoModule implements CameraModule,
             Log.i(TAG, "Setting capture-rate = " + captureRate);
             mMediaRecorder.setCaptureRate(captureRate);
 
-            // for HSR, encoder's target-framerate = capture-rate
             // for HFR, encoder's taget-framerate = 30fps (from profile)
-            int targetFrameRate = isHSR ? captureRate :
-                    isHFR ? 30 : mProfile.videoFrameRate;
+            int targetFrameRate = isSlowMotion ? 30 : mProfile.videoFrameRate;
 
             Log.i(TAG, "Setting target fps = " + targetFrameRate);
             mMediaRecorder.setVideoFrameRate(targetFrameRate);
@@ -1793,11 +1727,7 @@ public class SVideoModule implements CameraModule,
             // In case framerate is different, scale the bitrate
             int scaledBitrate = getHighSpeedVideoEncoderBitRate(mProfile, targetFrameRate);
             Log.i(TAG, "Scaled Video bitrate : " + scaledBitrate);
-            if (scaledBitrate > 0) {
-                mMediaRecorder.setVideoEncodingBitRate(scaledBitrate);
-            } else {
-                Log.e(TAG, "Cannot set Video bitrate because its negative");
-            }
+            mMediaRecorder.setVideoEncodingBitRate(scaledBitrate);
         }
 
         setRecordLocation();
@@ -1955,12 +1885,12 @@ public class SVideoModule implements CameraModule,
         Intent intent = mActivity.getIntent();
         if (intent.hasExtra(MediaStore.EXTRA_VIDEO_QUALITY)) {
             CameraSettings.removePreferenceFromScreen(screen,
-                    CameraSettings.KEY_VIDEO_QUALITY);
+                    CameraSettings.KEY_EXYNOS_VIDEO_QUALITY);
         }
 
         if (intent.hasExtra(MediaStore.EXTRA_DURATION_LIMIT)) {
             CameraSettings.removePreferenceFromScreen(screen,
-                    CameraSettings.KEY_VIDEO_QUALITY);
+                    CameraSettings.KEY_EXYNOS_VIDEO_QUALITY);
         }
         return screen;
     }
@@ -2036,30 +1966,6 @@ public class SVideoModule implements CameraModule,
         mActivity.updateStorageSpaceAndHint();
         if (mActivity.getStorageSpaceBytes() <= Storage.LOW_STORAGE_THRESHOLD_BYTES) {
             Log.v(TAG, "Storage issue, ignore the start request");
-            mStartRecPending = false;
-            return false;
-        }
-
-        if( mUnsupportedHFRVideoSize == true) {
-            Log.e(TAG, "Unsupported HFR and video size combinations");
-            RotateTextToast.makeText(mActivity,R.string.error_app_unsupported_hfr,
-                    Toast.LENGTH_SHORT).show();
-            mStartRecPending = false;
-            return false;
-        }
-
-        if (mUnsupportedHSRVideoSize == true) {
-            Log.e(TAG, "Unsupported HSR and video size combinations");
-            RotateTextToast.makeText(mActivity,R.string.error_app_unsupported_hsr,
-                    Toast.LENGTH_SHORT).show();
-            mStartRecPending = false;
-            return false;
-        }
-
-        if( mUnsupportedHFRVideoCodec == true) {
-            Log.e(TAG, "Unsupported HFR and video codec combinations");
-            RotateTextToast.makeText(mActivity, R.string.error_app_unsupported_hfr_codec,
-                    Toast.LENGTH_SHORT).show();
             mStartRecPending = false;
             return false;
         }
@@ -2537,174 +2443,67 @@ public class SVideoModule implements CameraModule,
         Log.v(TAG, "Color effect value =" + colorEffect);
         mParameters.setColorEffect(colorEffect);
 
-        String disMode = mPreferences.getString(
-                CameraSettings.KEY_DIS,
-                mActivity.getString(R.string.pref_camera_dis_default));
-        Log.v(TAG, "DIS value =" + disMode);
-        mIsDISEnabled = disMode.equals("enable");
-
-        if (is4KEnabled()) {
-            if (isSupported(mActivity.getString(R.string.pref_camera_dis_value_disable),
-                    CameraSettings.getSupportedDISModes(mParameters))) {
-                mParameters.set(CameraSettings.KEY_QC_DIS_MODE,
-                        mActivity.getString(R.string.pref_camera_dis_value_disable));
-                mUI.overrideSettings(CameraSettings.KEY_DIS,
-                        mActivity.getString(R.string.pref_camera_dis_value_disable));
-                mIsDISEnabled = false;
-            } else {
-                Log.e(TAG, "Not supported IS mode = " +
-                        mActivity.getString(R.string.pref_camera_dis_value_disable));
-            }
-        } else {
-            if (isSupported(disMode,
-                    CameraSettings.getSupportedDISModes(mParameters))) {
-                mParameters.set(CameraSettings.KEY_QC_DIS_MODE, disMode);
-            } else {
-                Log.e(TAG, "Not supported IS mode = " + disMode);
-            }
-        }
-
-        // Set anti banding parameter.
-        String antiBanding = mPreferences.getString(
-                 CameraSettings.KEY_ANTIBANDING,
-                 mActivity.getString(R.string.pref_camera_antibanding_default));
-        Log.v(TAG, "antiBanding value =" + antiBanding);
-        if (CameraUtil.isSupported(antiBanding, mParameters.getSupportedAntibanding())) {
-            mParameters.setAntibanding(antiBanding);
-        }
-
-        mUnsupportedHFRVideoSize = false;
-        mUnsupportedHFRVideoCodec = false;
-        mUnsupportedHSRVideoSize = false;
-        // To set preview format as YV12 , run command
-        // "adb shell setprop "debug.camera.yv12 true
-        if( PersistUtil.isYv12FormatEnable() ) {
-            Log.v(TAG, "preview format set to YV12");
-            mParameters.setPreviewFormat (ImageFormat.YV12);
-        }
-
-        mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
-        Log.v(TAG, "preview format set to NV21");
-
-        // Set High Frame Rate.
         String highFrameRate = mPreferences.getString(
-            CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE,
-            mActivity. getString(R.string.pref_camera_hfr_default));
-        boolean isHFR = "hfr".equals(highFrameRate.substring(0,3));
-        boolean isHSR = "hsr".equals(highFrameRate.substring(0,3));
+                CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
 
-        if (isHFR || isHSR) {
-            String hfrRate = highFrameRate.substring(3);
-            if (isHFR) {
-                mUnsupportedHFRVideoSize = true;
-            } else {
-                mUnsupportedHSRVideoSize = true;
-            }
-            String hfrsize = videoWidth+"x"+videoHeight;
-            Log.v(TAG, "current set resolution is : "+hfrsize+ " : Rate is : " + hfrRate );
-            try {
-                Size size = null;
-                if (isSupported(hfrRate,
-                        ParametersWrapper.getSupportedVideoHighFrameRateModes(mParameters))) {
-                    int index = ParametersWrapper.
-                            getSupportedVideoHighFrameRateModes(mParameters).indexOf(hfrRate);
-                    size = ParametersWrapper.getSupportedHfrSizes(mParameters).get(index);
-                }
-                if (size != null) {
-                    if (videoWidth <= size.width && videoHeight <= size.height) {
-                        if (isHFR) {
-                            mUnsupportedHFRVideoSize = false;
-                        } else {
-                            mUnsupportedHSRVideoSize = false;
-                        }
-                        Log.v(TAG,"Current hfr resolution is supported");
-                    }
-                }
-            } catch (NullPointerException e){
-                Log.e(TAG, "supported hfr sizes is null");
-            }
+        String slowMotion = mPreferences.getString(
+            CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+            mActivity. getString(R.string.pref_camera_exy_slow_motion_default));
 
-            int hfrFps = Integer.parseInt(hfrRate);
-            if (!isSessionSupportedByEncoder(videoWidth, videoHeight, hfrFps)) {
-                if (isHFR) {
-                            mUnsupportedHFRVideoSize = true;
-                        } else {
-                            mUnsupportedHSRVideoSize = true;
-                        }
-                    }
+        String disMode = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_DIS,
+                mActivity.getString(R.string.pref_camera_exy_dis_default));
 
-            if (isHFR) {
-                mParameters.set(CameraSettings.KEY_VIDEO_HSR, "off");
-                if (mUnsupportedHFRVideoSize) {
-                    ParametersWrapper.setVideoHighFrameRate(mParameters, "off");
-                    Log.v(TAG,"Unsupported hfr resolution");
-                } else {
-                    ParametersWrapper.setVideoHighFrameRate(mParameters, hfrRate);
-                }
-            } else {
-                ParametersWrapper.setVideoHighFrameRate(mParameters, "off");
-                if (mUnsupportedHSRVideoSize) {
-                    Log.v(TAG,"Unsupported hsr resolution");
-                    mParameters.set(CameraSettings.KEY_VIDEO_HSR, "off");
-                } else {
-                    mParameters.set(CameraSettings.KEY_VIDEO_HSR, hfrRate);
-                }
-            }
+        String videoHDR = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+
+        mRestartPreview = false;
+        mParameters.set(CameraSettings.KEY_EXYNOS_VDIS_MODE, disMode);
+        mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR,videoHDR);
+        mIsDISEnabled = disMode.equals("on");
+        mIsHighFrameRateEnabled = highFrameRate.equals("on");
+        mIsSlowSpeedEnabled = slowMotion.equals("on");
+        mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
+
+
+        if (mIsHighFrameRateEnabled || mIsSlowSpeedEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "off");
         } else {
-            ParametersWrapper.setVideoHighFrameRate(mParameters, "off");
-            mParameters.set(CameraSettings.KEY_VIDEO_HSR, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "on");
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "on");
+        }
+
+        if (mIsDISEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "matrix");
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "true");
+        } else {
+//            mParameters.set(CameraSettings.KEY_OIS, "still");
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "false");
+        }
+
+        if (mIsHighFrameRateEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_60_60);
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, "off");
+        } else if (mIsSlowSpeedEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "2");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_120_120);
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, "off");
+        } else if (mIsDISEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "-1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_30_30);
+        } else {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "-1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_10_30);
         }
         setFlipValue();
-
-        // Set Video HDR.
-        String videoHDR = mPreferences.getString(
-                CameraSettings.KEY_VIDEO_HDR,
-                mActivity.getString(R.string.pref_camera_video_hdr_default));
-        Log.v(TAG, "Video HDR Setting =" + videoHDR);
-        if (isSupported(videoHDR,
-                ParametersWrapper.getSupportedVideoHDRModes(mParameters))) {
-            ParametersWrapper.setVideoHDRMode(mParameters, videoHDR);
-        } else
-            ParametersWrapper.setVideoHDRMode(mParameters, "off");
-
-        //HFR/HSR recording not supported with DIS,TimeLapse,HDR option
-        String hfr = ParametersWrapper.getVideoHighFrameRate(mParameters);
-        String hsr = mParameters.get(CameraSettings.KEY_VIDEO_HSR);
-        String hdr = ParametersWrapper.getVideoHDRMode(mParameters);
-         if ( !"off".equals(highFrameRate) ) {
-             // Read time lapse recording interval.
-             String frameIntervalStr = mPreferences.getString(
-                    CameraSettings.KEY_VIDEO_TIME_LAPSE_FRAME_INTERVAL,
-                    mActivity.getString(R.string.pref_video_time_lapse_frame_interval_default));
-             int timeLapseInterval = Integer.parseInt(frameIntervalStr);
-             int rate = 0;
-             if ( isDigit(highFrameRate.substring(3)) ) {
-                 rate = Integer.parseInt(highFrameRate.substring(3));
-             }
-             Log.v(TAG, "rate = "+rate);
-             if ( (timeLapseInterval != 0) ||
-                  (disMode.equals("enable")) ||
-                  ((hdr != null) && (!hdr.equals("off"))) ) {
-                Log.v(TAG,"HDR/DIS/Time Lapse ON for HFR/HSR selection, turning HFR/HSR off");
-                ParametersWrapper.setVideoHighFrameRate(mParameters, "off");
-                mParameters.set(CameraSettings.KEY_VIDEO_HSR, "off");
-                mUI.overrideSettings(CameraSettings.KEY_VIDEO_HIGH_FRAME_RATE, "off");
-             }
-        }
 
         //getSupportedPictureSizes will always send a sorted a list in descending order
         Size biggestSize = mParameters.getSupportedPictureSizes().get(0);
 
-        if (biggestSize.width <= videoWidth || biggestSize.height <= videoHeight) {
-            if (disMode.equals("enable")) {
-                Log.v(TAG,"DIS is not supported for this video quality");
-                RotateTextToast.makeText(mActivity, R.string.error_app_unsupported_dis,
-                               Toast.LENGTH_LONG).show();
-                mParameters.set(CameraSettings.KEY_QC_DIS_MODE, "disable");
-                mUI.overrideSettings(CameraSettings.KEY_DIS,"disable");
-                mIsDISEnabled = false;
-            }
-        }
         //setting video rotation
         String videoRotation = mPreferences.getString(
             CameraSettings.KEY_VIDEO_ROTATION,
@@ -2814,13 +2613,6 @@ public class SVideoModule implements CameraModule,
 
         mParameters.set(CameraUtil.RECORDING_HINT, CameraUtil.TRUE);
 
-        // Enable video stabilization. Convenience methods not available in API
-        // level <= 14
-        String vstabSupported = mParameters.get("video-stabilization-supported");
-        if ("true".equals(vstabSupported)) {
-            mParameters.set("video-stabilization", "true");
-        }
-
         // Set picture size.
         // The logic here is different from the logic in still-mode camera.
         // There we determine the preview size based on the picture size, but
@@ -2908,20 +2700,84 @@ public class SVideoModule implements CameraModule,
 
     @Override
     public void onSharedPreferenceChanged(ListPreference pref) {
-        if (pref != null && CameraSettings.KEY_VIDEO_QUALITY.equals(pref.getKey())) {
+        if (pref != null && CameraSettings.KEY_EXYNOS_DIS.equals(pref.getKey())) {
+            mRestartCam = true;
+            String disvalue = pref.getValue();
+            if (!disvalue.equals(mActivity.getString(R.string.pref_camera_exy_dis_default))) {
+                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
+                    if (!vhdrDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
+                        RotateTextToast.makeText(mActivity, R.string.toast_video_dis_disable_vhdr,
+                                Toast.LENGTH_LONG).show();
+                    }
+            }
+        }
+        if (pref != null && CameraSettings.KEY_EXYNOS_VIDEO_QUALITY.equals(pref.getKey())) {
             String videoQuality = pref.getValue();
             if (CameraSettings.VIDEO_QUALITY_TABLE.containsKey(videoQuality)) {
                 int quality = CameraSettings.VIDEO_QUALITY_TABLE.get(videoQuality);
                 if ((quality == CamcorderProfile.QUALITY_2160P
                         || quality == CamcorderProfileWrapper.QUALITY_4KDCI)
                         && mPreferences != null) {
-                    String disDisable = mActivity.getString(R.string.pref_camera_dis_value_disable);
+                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
+                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
                     if (!disDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_DIS, disDisable))) {
-                        RotateTextToast.makeText(mActivity, R.string.video_quality_4k_disable_IS,
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
+                        mRestartCam = true;
+                        RotateTextToast.makeText(mActivity, R.string.toast_video_4k_disable_IS,
                                 Toast.LENGTH_LONG).show();
                     }
+                    if (!vhdrDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
+                        mRestartCam = true;
+                        RotateTextToast.makeText(mActivity, R.string.toast_video_4k_disable_vhdr,
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else if (quality != CamcorderProfile.QUALITY_1080P) {
+                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
+                    if (!disDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
+                        mRestartCam = true;
+                        RotateTextToast.makeText(mActivity, R.string.toast_video_enable_dis_1080p,
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else if (quality != CamcorderProfile.QUALITY_720P) {
+                    String slowMotionDisable = mActivity.getString(R.string.pref_camera_exy_slow_motion_default);
+                    if (!slowMotionDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_SLOW_MOTION, slowMotionDisable))) {
+                        mRestartCam = true;
+                    }
                 }
+            }
+        }
+        if (pref != null && CameraSettings.KEY_EXYNOS_SLOW_MOTION.equals(pref.getKey())) {
+            mRestartCam = true;
+            String slowMotionValue = pref.getValue();
+            if (!slowMotionValue.equals(mActivity.getString(R.string.pref_camera_exy_slow_motion_default))) {
+                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
+                    if (!vhdrDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
+                        RotateTextToast.makeText(mActivity, R.string.toast_videohfr_disable_vhdr,
+                                Toast.LENGTH_LONG).show();
+                    }
+            }
+        }
+        if (pref != null && CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE.equals(pref.getKey())) {
+            String fastfpsvalue = pref.getValue();
+            if (!fastfpsvalue.equals(mActivity.getString(R.string.pref_camera_exy_high_framerate_default))) {
+                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
+                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
+                    if (!disDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
+                        mRestartCam = true;
+                        RotateTextToast.makeText(mActivity, R.string.toast_video_ffps_disable_IS,
+                                Toast.LENGTH_LONG).show();
+                    }
+                    if (!vhdrDisable.equals(
+                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
+                        RotateTextToast.makeText(mActivity, R.string.videoffps_disable_vhdr,
+                                Toast.LENGTH_LONG).show();
+                    }
             }
         }
         onSharedPreferenceChanged();
@@ -2955,6 +2811,14 @@ public class SVideoModule implements CameraModule,
             } else {
                 setCameraParameters(false);
             }
+            if (mRestartCam){
+                mPendingSwitchCameraId = mCameraId;
+// Uncomment for debbuging
+//            RotateTextToast.makeText(mActivity, R.string.toast_restarting_info,
+//                                Toast.LENGTH_SHORT).show();
+                switchCamera();
+            }
+            mRestartCam = false;
             mRestartPreview = false;
             Storage.setSaveSDCard(
                 mPreferences.getString(CameraSettings.KEY_CAMERA_SAVEPATH, "0").equals("1"));
