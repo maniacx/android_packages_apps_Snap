@@ -347,6 +347,7 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_VIDEO_STABILIZATION = "video-stabilization";
     public static final String KEY_EXYNOS_PHASE_AF = "phase-af";
     public static final String KEY_EXYNOS_DYNAMIC_RANGE_CONTROL = "dynamic-range-control";
+    public static final String KEY_EXYNOS_SLOWAE = "slow_ae";
     public static final String KEY_EXYNOS_OIS = "ois";
 
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";

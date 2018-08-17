@@ -2475,7 +2475,7 @@ public class SVideoModule implements CameraModule,
         mIsHighFrameRateEnabled = highFrameRate.equals("on");
         mIsSlowSpeedEnabled = slowMotion.equals("on");
         mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
-
+        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, "on");
 
         if (isFrontFacingCameraEnabled()) {
             mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");

@@ -2999,6 +2999,8 @@ public class SPhotoModule
             }
         }
 
+        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, "off");
+
         // Set exposure_compensation
         String exposureCompStr = getExposureCompSafe();
         if (exposureCompStr != null) {
