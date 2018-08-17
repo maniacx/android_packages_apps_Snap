@@ -977,9 +977,9 @@ public class SVideoMenu extends MenuController
                 RotateTextToast.makeText(mActivity, R.string.error_app_unsupported_hfr_selection,
                         Toast.LENGTH_LONG).show();
             }
-            setPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION, "off");
+            setPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION, CameraSettings.VALUE_OFF);
         }
-        if (notSame(pref, CameraSettings.KEY_EXYNOS_SLOW_MOTION, "off")) {
+        if (notSame(pref, CameraSettings.KEY_EXYNOS_SLOW_MOTION, CameraSettings.VALUE_OFF)) {
             String defaultValue =
                     mActivity.getString(R.string.pref_video_time_lapse_frame_interval_default);
             ListPreference lapsePref = mPreferenceGroup
@@ -991,7 +991,7 @@ public class SVideoMenu extends MenuController
             setPreference(CameraSettings.KEY_VIDEO_TIME_LAPSE_FRAME_INTERVAL, defaultValue);
         }
 
-        if (notSame(pref, CameraSettings.KEY_RECORD_LOCATION, "off")) {
+        if (notSame(pref, CameraSettings.KEY_RECORD_LOCATION, CameraSettings.VALUE_OFF)) {
             mActivity.requestLocationPermission();
         }
 

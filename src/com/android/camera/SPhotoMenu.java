@@ -1211,7 +1211,7 @@ public class SPhotoMenu extends MenuController
             mUI.getCameraControls().removeFromViewList(mMeteringSwitcher);
         }
 
-        if (same(pref, CameraSettings.KEY_RECORD_LOCATION, "on")) {
+        if (same(pref, CameraSettings.KEY_RECORD_LOCATION, CameraSettings.VALUE_ON)) {
             mActivity.requestLocationPermission();
         }
 

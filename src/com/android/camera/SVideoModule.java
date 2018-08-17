@@ -2471,44 +2471,44 @@ public class SVideoModule implements CameraModule,
         mRestartPreview = false;
         mParameters.set(CameraSettings.KEY_EXYNOS_VDIS_MODE, disMode);
         mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR,videoHDR);
-        mIsDISEnabled = disMode.equals("on");
-        mIsHighFrameRateEnabled = highFrameRate.equals("on");
-        mIsSlowSpeedEnabled = slowMotion.equals("on");
+        mIsDISEnabled = disMode.equals(CameraSettings.VALUE_ON);
+        mIsHighFrameRateEnabled = highFrameRate.equals(CameraSettings.VALUE_ON);
+        mIsSlowSpeedEnabled = slowMotion.equals(CameraSettings.VALUE_ON);
         mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
-        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, "on");
+        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, CameraSettings.VALUE_ON);
 
         if (isFrontFacingCameraEnabled()) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
         } else if (mIsHighFrameRateEnabled || mIsSlowSpeedEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
         } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "on");
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "on");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_ON);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_ON);
         }
 
         if (mIsDISEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "center");
-            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "true");
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_CENTER_MODE);
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_TRUE);
         } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "still");
-            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "false");
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_STILL_MODE);
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_FALSE);
         }
 
         if (mIsHighFrameRateEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_FAST);
             mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_60_60);
-            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
         } else if (mIsSlowSpeedEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "2");
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_SLOW);
             mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_120_120);
-            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
         } else if (mIsDISEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "-1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
             mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_30_30);
         } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, "-1");
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
             mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_10_30);
         }
         setFlipValue();
@@ -2545,10 +2545,10 @@ public class SVideoModule implements CameraModule,
                 ParametersWrapper.getSupportedFaceDetectionModes(mParameters))) {
             Log.d(TAG, "setFaceDetectionMode "+faceDetection);
             ParametersWrapper.setFaceDetectionMode(mParameters, faceDetection);
-            if(faceDetection.equals("on") && mFaceDetectionEnabled == false) {
+            if(faceDetection.equals(CameraSettings.VALUE_ON) && mFaceDetectionEnabled == false) {
                 mFaceDetectionEnabled = true;
                 startFaceDetection();
-            } else if(faceDetection.equals("off") && mFaceDetectionEnabled == true) {
+            } else if(faceDetection.equals(CameraSettings.VALUE_OFF) && mFaceDetectionEnabled == true) {
                 stopFaceDetection();
                 mFaceDetectionEnabled = false;
             }

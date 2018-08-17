@@ -1936,7 +1936,7 @@ public class SPhotoModule
             ListPreference prefSelfieMirror = mPreferenceGroup.findPreference(CameraSettings.KEY_SELFIE_MIRROR);
             if(prefSelfieMirror != null && prefSelfieMirror.getValue() != null
                     && prefSelfieMirror.getValue().equalsIgnoreCase("enable")) {
-                mUI.overrideSettings(CameraSettings.KEY_LONGSHOT, "off");
+                mUI.overrideSettings(CameraSettings.KEY_LONGSHOT, CameraSettings.VALUE_OFF);
             }
         }
 
@@ -2252,7 +2252,7 @@ public class SPhotoModule
     {
         if(mPreferences.getString(CameraSettings.KEY_SELFIE_FLASH,
                 mActivity.getString(R.string.pref_selfie_flash_default))
-                .equalsIgnoreCase("on") &&
+                .equalsIgnoreCase(CameraSettings.VALUE_ON) &&
                 mCameraId == CameraHolder.instance().getFrontCameraId()) {
             mUI.startSelfieFlash();
             if(selfieThread == null) {
@@ -2280,7 +2280,7 @@ public class SPhotoModule
                 mActivity.getString(R.string.pref_camera_longshot_default));
 
             Log.d(TAG, "longshot_enable = " + longshot_enable);
-            if (longshot_enable.equals("on")) {
+            if (longshot_enable.equals(CameraSettings.VALUE_ON)) {
                 boolean enable = PersistUtil.isLongSaveEnabled();
                 mLongshotSave = enable;
 
@@ -2999,7 +2999,7 @@ public class SPhotoModule
             }
         }
 
-        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, "off");
+        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, CameraSettings.VALUE_OFF);
 
         // Set exposure_compensation
         String exposureCompStr = getExposureCompSafe();
@@ -3047,11 +3047,11 @@ public class SPhotoModule
 
         CameraInfo info = CameraHolder.instance().getCameraInfo()[mCameraId];
         if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
         } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "on");
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "on");
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_ON);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_ON);
         }
 
         // Set metering mode
@@ -3100,11 +3100,11 @@ public class SPhotoModule
         if (CameraUtil.isSupported(faceDetection,
                 ParametersWrapper.getSupportedFaceDetectionModes(mParameters))) {
             ParametersWrapper.setFaceDetectionMode(mParameters, faceDetection);
-            if(faceDetection.equals("on") && mFaceDetectionEnabled == false) {
+            if(faceDetection.equals(CameraSettings.VALUE_ON) && mFaceDetectionEnabled == false) {
                 mFaceDetectionEnabled = true;
                 startFaceDetection();
             }
-            if(faceDetection.equals("off") && mFaceDetectionEnabled == true) {
+            if(faceDetection.equals(CameraSettings.VALUE_OFF) && mFaceDetectionEnabled == true) {
                 stopFaceDetection();
                 mFaceDetectionEnabled = false;
             }

@@ -310,6 +310,8 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_DIS = "pref_camera_exy_dis_key";
     public static final String KEY_EXYNOS_VIDEO_HDR = "pref_camera_exy_video_hdr_key";
 
+    public static final String KEY_EXYNOS_VALUE_TRUE = "true";
+    public static final String KEY_EXYNOS_VALUE_FALSE = "false";
     public static final String KEY_EXYNOS_CUR_SATURATION = "saturation";
     public static final String KEY_EXYNOS_MIN_SATURATION = "saturation-min";
     public static final String KEY_EXYNOS_MAX_SATURATION = "saturation-max";
@@ -341,6 +343,9 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_FPS_30_30 = "30000,30000";
     public static final String KEY_EXYNOS_FPS_60_60 = "60000,60000";
     public static final String KEY_EXYNOS_FPS_120_120 = "120000,120000";
+    public static final String KEY_EXYNOS_FPS_MODE_SLOW = "2";
+    public static final String KEY_EXYNOS_FPS_MODE_FAST = "1";
+    public static final String KEY_EXYNOS_FPS_MODE_NORMAL = "-1";
     public static final String KEY_EXYNOS_VDIS_MODE = "sw-vdis";
     public static final String KEY_EXYNOS_FAST_FPS_MODE = "fast-fps-mode";
     public static final String KEY_EXYNOS_PREVIEW_FPS_RANGE = "preview-fps-range";
@@ -349,6 +354,8 @@ public class CameraSettings {
     public static final String KEY_EXYNOS_DYNAMIC_RANGE_CONTROL = "dynamic-range-control";
     public static final String KEY_EXYNOS_SLOWAE = "slow_ae";
     public static final String KEY_EXYNOS_OIS = "ois";
+    public static final String KEY_EXYNOS_OIS_STILL_MODE = "still";
+    public static final String KEY_EXYNOS_OIS_CENTER_MODE = "center";
 
     private static final String KEY_EXYNOS_SUPPORTED_RT_HDR = "rt-hdr-values";
     private static final String KEY_EXYNOS_METERING_VALUES = "metering-values";
