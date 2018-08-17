@@ -3043,6 +3043,15 @@ public class SPhotoModule
             mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, rtHdr);
         }
 
+        CameraInfo info = CameraHolder.instance().getCameraInfo()[mCameraId];
+        if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "off");
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "off");
+        } else {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, "on");
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, "on");
+        }
+
         // Set metering mode
         String meteringMode = mPreferences.getString(
                 CameraSettings.KEY_EXYNOS_METERING_MODE,
