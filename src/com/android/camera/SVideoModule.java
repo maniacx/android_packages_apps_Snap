@@ -1033,6 +1033,15 @@ public class SVideoModule implements CameraModule,
         mPreferenceRead = true;
     }
 
+    public boolean isFrontFacingCameraEnabled() {
+        CameraInfo info = CameraHolder.instance().getCameraInfo()[mCameraId];
+        if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
+           return true;
+       } else {
+           return false;
+       }
+    }
+
     public boolean is4KEnabled() {
        if (mProfile.quality == CamcorderProfile.QUALITY_2160P ||
            mProfile.quality == CamcorderProfile.QUALITY_TIME_LAPSE_2160P ||

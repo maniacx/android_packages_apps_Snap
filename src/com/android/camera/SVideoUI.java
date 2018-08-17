@@ -753,6 +753,13 @@ public class SVideoUI implements PieRenderer.PieListener,
         }
     }
 
+    public boolean isFrontFacingCameraEnabled() {
+        if(mController != null)
+            return ((SVideoModule)mController).isFrontFacingCameraEnabled();
+        else
+            return false;
+    }
+
     public boolean is4KEnabled() {
         if(mController != null)
             return ((SVideoModule)mController).is4KEnabled();

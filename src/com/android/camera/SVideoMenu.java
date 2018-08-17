@@ -672,7 +672,7 @@ public class SVideoMenu extends MenuController
 
     private void overridePreferenceAccessibility() {
         overrideMenuForLocation();
-        overrideMenuFor4K();
+        overrideMenuForModes();
     }
 
     private void overrideMenuForLocation() {
@@ -682,8 +682,40 @@ public class SVideoMenu extends MenuController
             mListMenu.setPreferenceEnabled(CameraSettings.KEY_RECORD_LOCATION, false);
         }
     }
-    private void overrideMenuFor4K() {
-        if(mUI.is4KEnabled()) {
+    private void overrideMenuForModes() {
+        if(mUI.isFrontFacingCameraEnabled()) {
+            ListPreference highframerate =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE);
+            if (highframerate != null && !"off".equals(highframerate.getValue())) {
+               mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                            mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
+            }
+            mListMenu.setPreferenceEnabled(
+                     CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,false);
+
+            ListPreference slowmotion =
+                    mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_SLOW_MOTION);
+            if (slowmotion != null && !"off".equals(slowmotion.getValue())) {
+               mListMenu.overrideSettings(
+                        CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+                            mActivity.getString(R.string.pref_camera_exy_slow_motion_default));
+            }
+            mListMenu.setPreferenceEnabled(
+                     CameraSettings.KEY_EXYNOS_SLOW_MOTION,false);
+
+            if(mUI.isDISmode()) {
+                ListPreference videohdr =
+                        mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_VIDEO_HDR);
+                if (videohdr != null && !"off".equals(videohdr.getValue())) {
+                   mListMenu.overrideSettings(
+                            CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+                }
+                mListMenu.setPreferenceEnabled(
+                         CameraSettings.KEY_EXYNOS_VIDEO_HDR,false);
+            }
+        } else if(mUI.is4KEnabled()) {
 
             ListPreference dismode =
                     mPreferenceGroup.findPreference(CameraSettings.KEY_EXYNOS_DIS);
