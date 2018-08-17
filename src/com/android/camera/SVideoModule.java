@@ -2489,10 +2489,10 @@ public class SVideoModule implements CameraModule,
         }
 
         if (mIsDISEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "matrix");
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "center");
             mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "true");
         } else {
-//            mParameters.set(CameraSettings.KEY_OIS, "still");
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, "still");
             mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, "false");
         }
 
