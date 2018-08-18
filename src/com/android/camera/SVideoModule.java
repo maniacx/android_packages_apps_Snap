@@ -218,8 +218,6 @@ public class SVideoModule implements CameraModule,
     private boolean mStartPrevPending = false;
     private boolean mStopPrevPending = false;
 
-    //settings, which if enabled, need to turn off low power mode
-    private boolean mIsFlipEnabled = false;
     private boolean mIsHighFrameRateEnabled = false;
     private boolean mIsSlowSpeedEnabled = false;
     private boolean mIsDISEnabled = false;
@@ -364,7 +362,6 @@ public class SVideoModule implements CameraModule,
     private int mVideoEncoder;
     private int mAudioEncoder;
     private boolean mRestartPreview = false;
-    private boolean mRestartCam = false;
     private int videoWidth;
     private int videoHeight;
     boolean mUnsupportedResolution = false;
@@ -768,8 +765,6 @@ public class SVideoModule implements CameraModule,
             Log.v(TAG, "onOrientationChanged, update parameters");
             if ((mCameraDevice != null) && (mParameters != null)
                     && (true == mPreviewing) && !mMediaRecorderRecording){
-                setFlipValue();
-                updatePowerMode();
                 mCameraDevice.setParameters(mParameters);
             }
             mUI.tryToCloseSubList();
@@ -931,17 +926,6 @@ public class SVideoModule implements CameraModule,
 
         Log.v(TAG, "Audio Encoder selected = " +mAudioEncoder);
 
-        if(ParametersWrapper.isPowerModeSupported(mParameters)) {
-            String powermode = mPreferences.getString(
-                    CameraSettings.KEY_POWER_MODE,
-                    mActivity.getString(R.string.pref_camera_powermode_default));
-            Log.v(TAG, "read videopreferences power mode =" +powermode);
-            String old_mode = ParametersWrapper.getPowerMode(mParameters);
-            if(!old_mode.equals(powermode) && mPreviewing)
-                mRestartPreview = true;
-
-            ParametersWrapper.setPowerMode(mParameters, powermode);
-        }
    }
 
     private final class AutoFocusCallback
@@ -2327,59 +2311,6 @@ public class SVideoModule implements CameraModule,
         return supported == null ? false : supported.indexOf(value) >= 0;
     }
 
-    private void setFlipValue() {
-
-        // Read Flip mode from adb command
-        //value: 0(default) - FLIP_MODE_OFF
-        //value: 1 - FLIP_MODE_H
-        //value: 2 - FLIP_MODE_V
-        //value: 3 - FLIP_MODE_VH
-
-        PersistUtil myUtil     = new PersistUtil();
-        int preview_flip_value = myUtil.getPreviewFlip();
-        int video_flip_value   = myUtil.getVideoFlip();
-        int picture_flip_value = myUtil.getPictureFlip();
-
-        int rotation = CameraUtil.getJpegRotation(mCameraId, mOrientation);
-        mParameters.setRotation(rotation);
-        if (rotation == 90 || rotation == 270) {
-            // in case of 90 or 270 degree, V/H flip should reverse
-            if (preview_flip_value == 1) {
-                preview_flip_value = 2;
-            } else if (preview_flip_value == 2) {
-                preview_flip_value = 1;
-            }
-            if (video_flip_value == 1) {
-                video_flip_value = 2;
-            } else if (video_flip_value == 2) {
-                video_flip_value = 1;
-            }
-            if (picture_flip_value == 1) {
-                picture_flip_value = 2;
-            } else if (picture_flip_value == 2) {
-                picture_flip_value = 1;
-            }
-        }
-        String preview_flip = CameraUtil.getFilpModeString(preview_flip_value);
-        String video_flip = CameraUtil.getFilpModeString(video_flip_value);
-        String picture_flip = CameraUtil.getFilpModeString(picture_flip_value);
-
-        if(CameraUtil.isSupported(preview_flip, CameraSettings.getSupportedFlipMode(mParameters))){
-            mParameters.set(CameraSettings.KEY_QC_PREVIEW_FLIP, preview_flip);
-        }
-        if(CameraUtil.isSupported(video_flip, CameraSettings.getSupportedFlipMode(mParameters))){
-            mParameters.set(CameraSettings.KEY_QC_VIDEO_FLIP, video_flip);
-        }
-        if(CameraUtil.isSupported(picture_flip, CameraSettings.getSupportedFlipMode(mParameters))){
-            mParameters.set(CameraSettings.KEY_QC_SNAPSHOT_PICTURE_FLIP, picture_flip);
-        }
-
-        if ((preview_flip_value != 0) || (video_flip_value != 0) || (picture_flip_value != 0)) {
-            mIsFlipEnabled = true;
-        } else {
-            mIsFlipEnabled = false;
-        }
-    }
     private void setZoomMenuValue() {
         String zoomMenuValue = mPreferences.getString(CameraSettings.KEY_ZOOM,
                                 mActivity.getString(R.string.pref_camera_zoom_default));
@@ -2433,124 +2364,6 @@ public class SVideoModule implements CameraModule,
                 mParameters.setZoom(mZoomIdxTbl[zoomValue-1]);
             } else {
                 Log.e(TAG, "Zoom value "+zoomValue+" is not supported!");
-            }
-        }
-    }
-
-     private void qcomSetCameraParameters(){
-        // add QCOM Parameters here
-        // Set color effect parameter.
-        Log.i(TAG,"NOTE: qcomSetCameraParameters " + videoWidth + " x " + videoHeight);
-
-        setZoomMenuValue();
-
-        mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_VIDEO);
-
-        String colorEffect = mPreferences.getString(
-            CameraSettings.KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT,
-            mActivity.getString(R.string.pref_camera_coloreffect_default));
-        Log.v(TAG, "Color effect value =" + colorEffect);
-        mParameters.setColorEffect(colorEffect);
-
-        String highFrameRate = mPreferences.getString(
-                CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
-                mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
-
-        String slowMotion = mPreferences.getString(
-            CameraSettings.KEY_EXYNOS_SLOW_MOTION,
-            mActivity. getString(R.string.pref_camera_exy_slow_motion_default));
-
-        String disMode = mPreferences.getString(
-                CameraSettings.KEY_EXYNOS_DIS,
-                mActivity.getString(R.string.pref_camera_exy_dis_default));
-
-        String videoHDR = mPreferences.getString(
-                CameraSettings.KEY_EXYNOS_VIDEO_HDR,
-                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
-
-        mRestartPreview = false;
-        mParameters.set(CameraSettings.KEY_EXYNOS_VDIS_MODE, disMode);
-        mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR,videoHDR);
-        mIsDISEnabled = disMode.equals(CameraSettings.VALUE_ON);
-        mIsHighFrameRateEnabled = highFrameRate.equals(CameraSettings.VALUE_ON);
-        mIsSlowSpeedEnabled = slowMotion.equals(CameraSettings.VALUE_ON);
-        mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
-        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, CameraSettings.VALUE_ON);
-
-        if (isFrontFacingCameraEnabled()) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
-        } else if (mIsHighFrameRateEnabled || mIsSlowSpeedEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
-        } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_ON);
-            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_ON);
-        }
-
-        if (mIsDISEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_CENTER_MODE);
-            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_TRUE);
-        } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_STILL_MODE);
-            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_FALSE);
-        }
-
-        if (mIsHighFrameRateEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_FAST);
-            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_60_60);
-            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
-        } else if (mIsSlowSpeedEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_SLOW);
-            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_120_120);
-            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
-        } else if (mIsDISEnabled) {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
-            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_30_30);
-        } else {
-            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
-            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_10_30);
-        }
-        setFlipValue();
-
-        //getSupportedPictureSizes will always send a sorted a list in descending order
-        Size biggestSize = mParameters.getSupportedPictureSizes().get(0);
-
-        //setting video rotation
-        String videoRotation = mPreferences.getString(
-            CameraSettings.KEY_VIDEO_ROTATION,
-            mActivity.getString(R.string.pref_camera_video_rotation_default));
-        if (isSupported(videoRotation,
-                ParametersWrapper.getSupportedVideoRotationValues(mParameters))) {
-            ParametersWrapper.setVideoRotation(mParameters, videoRotation);
-        }
-
-        //set power mode settings
-        updatePowerMode();
-
-        // Set focus mode
-        mParameters.setFocusMode(mFocusManager.getFocusMode(true));
-
-        // Set focus time.
-        mFocusManager.setFocusTime(Integer.decode(
-                mPreferences.getString(CameraSettings.KEY_VIDEOCAMERA_FOCUS_TIME,
-                mActivity.getString(R.string.pref_camera_video_focustime_default))));
-
-        // Set face detetction parameter.
-        String faceDetection = mPreferences.getString(
-            CameraSettings.KEY_FACE_DETECTION,
-            mActivity.getString(R.string.pref_camera_facedetection_default));
-
-        if (CameraUtil.isSupported(faceDetection,
-                ParametersWrapper.getSupportedFaceDetectionModes(mParameters))) {
-            Log.d(TAG, "setFaceDetectionMode "+faceDetection);
-            ParametersWrapper.setFaceDetectionMode(mParameters, faceDetection);
-            if(faceDetection.equals(CameraSettings.VALUE_ON) && mFaceDetectionEnabled == false) {
-                mFaceDetectionEnabled = true;
-                startFaceDetection();
-            } else if(faceDetection.equals(CameraSettings.VALUE_OFF) && mFaceDetectionEnabled == true) {
-                stopFaceDetection();
-                mFaceDetectionEnabled = false;
             }
         }
     }
@@ -2672,7 +2485,114 @@ public class SVideoModule implements CameraModule,
         CameraUtil.dumpParameters(mParameters);
 
         //Call Qcom related Camera Parameters
-        qcomSetCameraParameters();
+        setZoomMenuValue();
+
+        mParameters.set(CameraSettings.KEY_EXYNOS_SHOTMODE, CameraSettings.KEY_EXYNOS_SHOT_VIDEO);
+
+        String colorEffect = mPreferences.getString(
+            CameraSettings.KEY_EXYNOS_VIDEOCAMERA_COLOR_EFFECT,
+            mActivity.getString(R.string.pref_camera_coloreffect_default));
+        Log.v(TAG, "Color effect value =" + colorEffect);
+        mParameters.setColorEffect(colorEffect);
+
+        String highFrameRate = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
+                mActivity.getString(R.string.pref_camera_exy_high_framerate_default));
+
+        String slowMotion = mPreferences.getString(
+            CameraSettings.KEY_EXYNOS_SLOW_MOTION,
+            mActivity. getString(R.string.pref_camera_exy_slow_motion_default));
+
+        String disMode = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_DIS,
+                mActivity.getString(R.string.pref_camera_exy_dis_default));
+
+        String videoHDR = mPreferences.getString(
+                CameraSettings.KEY_EXYNOS_VIDEO_HDR,
+                mActivity.getString(R.string.pref_camera_exy_video_hdr_default));
+
+        mRestartPreview = false;
+        mParameters.set(CameraSettings.KEY_EXYNOS_VDIS_MODE, disMode);
+        mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR,videoHDR);
+        mIsDISEnabled = disMode.equals(CameraSettings.VALUE_ON);
+        mIsHighFrameRateEnabled = highFrameRate.equals(CameraSettings.VALUE_ON);
+        mIsSlowSpeedEnabled = slowMotion.equals(CameraSettings.VALUE_ON);
+        mParameters.set(KEY_PREVIEW_FORMAT, FORMAT_NV21);
+        mParameters.set(CameraSettings.KEY_EXYNOS_SLOWAE, CameraSettings.VALUE_ON);
+
+        if (isFrontFacingCameraEnabled()) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
+        } else if (mIsHighFrameRateEnabled || mIsSlowSpeedEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_OFF);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_OFF);
+        } else {
+            mParameters.set(CameraSettings.KEY_EXYNOS_PHASE_AF, CameraSettings.VALUE_ON);
+            mParameters.set(CameraSettings.KEY_EXYNOS_DYNAMIC_RANGE_CONTROL, CameraSettings.VALUE_ON);
+        }
+
+        if (mIsDISEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_CENTER_MODE);
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_TRUE);
+        } else {
+            mParameters.set(CameraSettings.KEY_EXYNOS_OIS, CameraSettings.KEY_EXYNOS_OIS_STILL_MODE);
+            mParameters.set(CameraSettings.KEY_EXYNOS_VIDEO_STABILIZATION, CameraSettings.KEY_EXYNOS_VALUE_FALSE);
+        }
+
+        if (mIsHighFrameRateEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_FAST);
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_60_60);
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
+        } else if (mIsSlowSpeedEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_SLOW);
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_120_120);
+            mParameters.set(CameraSettings.KEY_EXYNOS_RT_HDR, CameraSettings.VALUE_OFF);
+        } else if (mIsDISEnabled) {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_30_30);
+        } else {
+            mParameters.set(CameraSettings.KEY_EXYNOS_FAST_FPS_MODE, CameraSettings.KEY_EXYNOS_FPS_MODE_NORMAL);
+            mParameters.set(CameraSettings.KEY_EXYNOS_PREVIEW_FPS_RANGE, CameraSettings.KEY_EXYNOS_FPS_10_30);
+        }
+
+        //getSupportedPictureSizes will always send a sorted a list in descending order
+        Size biggestSize = mParameters.getSupportedPictureSizes().get(0);
+
+        //setting video rotation
+        String videoRotation = mPreferences.getString(
+            CameraSettings.KEY_VIDEO_ROTATION,
+            mActivity.getString(R.string.pref_camera_video_rotation_default));
+        if (isSupported(videoRotation,
+                ParametersWrapper.getSupportedVideoRotationValues(mParameters))) {
+            ParametersWrapper.setVideoRotation(mParameters, videoRotation);
+        }
+
+        // Set focus mode
+        mParameters.setFocusMode(mFocusManager.getFocusMode(true));
+
+        // Set focus time.
+        mFocusManager.setFocusTime(Integer.decode(
+                mPreferences.getString(CameraSettings.KEY_VIDEOCAMERA_FOCUS_TIME,
+                mActivity.getString(R.string.pref_camera_video_focustime_default))));
+
+        // Set face detetction parameter.
+        String faceDetection = mPreferences.getString(
+            CameraSettings.KEY_FACE_DETECTION,
+            mActivity.getString(R.string.pref_camera_facedetection_default));
+
+        if (CameraUtil.isSupported(faceDetection,
+                ParametersWrapper.getSupportedFaceDetectionModes(mParameters))) {
+            Log.d(TAG, "setFaceDetectionMode "+faceDetection);
+            ParametersWrapper.setFaceDetectionMode(mParameters, faceDetection);
+            if(faceDetection.equals(CameraSettings.VALUE_ON) && mFaceDetectionEnabled == false) {
+                mFaceDetectionEnabled = true;
+                startFaceDetection();
+            } else if(faceDetection.equals(CameraSettings.VALUE_OFF) && mFaceDetectionEnabled == true) {
+                stopFaceDetection();
+                mFaceDetectionEnabled = false;
+            }
+        }
+
 
         boolean flag = false;
         if (mPreviewing) {
@@ -2712,86 +2632,6 @@ public class SVideoModule implements CameraModule,
 
     @Override
     public void onSharedPreferenceChanged(ListPreference pref) {
-        if (pref != null && CameraSettings.KEY_EXYNOS_DIS.equals(pref.getKey())) {
-            mRestartCam = true;
-            String disvalue = pref.getValue();
-            if (!disvalue.equals(mActivity.getString(R.string.pref_camera_exy_dis_default))) {
-                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
-                    if (!vhdrDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
-                        RotateTextToast.makeText(mActivity, R.string.toast_video_dis_disable_vhdr,
-                                Toast.LENGTH_LONG).show();
-                    }
-            }
-        }
-        if (pref != null && CameraSettings.KEY_EXYNOS_VIDEO_QUALITY.equals(pref.getKey())) {
-            String videoQuality = pref.getValue();
-            if (CameraSettings.VIDEO_QUALITY_TABLE.containsKey(videoQuality)) {
-                int quality = CameraSettings.VIDEO_QUALITY_TABLE.get(videoQuality);
-                if ((quality == CamcorderProfile.QUALITY_2160P
-                        || quality == CamcorderProfileWrapper.QUALITY_4KDCI)
-                        && mPreferences != null) {
-                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
-                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
-                    if (!disDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
-                        mRestartCam = true;
-                        RotateTextToast.makeText(mActivity, R.string.toast_video_4k_disable_IS,
-                                Toast.LENGTH_LONG).show();
-                    }
-                    if (!vhdrDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
-                        mRestartCam = true;
-                        RotateTextToast.makeText(mActivity, R.string.toast_video_4k_disable_vhdr,
-                                Toast.LENGTH_LONG).show();
-                    }
-                } else if (quality != CamcorderProfile.QUALITY_1080P) {
-                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
-                    if (!disDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
-                        mRestartCam = true;
-                        RotateTextToast.makeText(mActivity, R.string.toast_video_enable_dis_1080p,
-                                Toast.LENGTH_LONG).show();
-                    }
-                } else if (quality != CamcorderProfile.QUALITY_720P) {
-                    String slowMotionDisable = mActivity.getString(R.string.pref_camera_exy_slow_motion_default);
-                    if (!slowMotionDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_SLOW_MOTION, slowMotionDisable))) {
-                        mRestartCam = true;
-                    }
-                }
-            }
-        }
-        if (pref != null && CameraSettings.KEY_EXYNOS_SLOW_MOTION.equals(pref.getKey())) {
-            mRestartCam = true;
-            String slowMotionValue = pref.getValue();
-            if (!slowMotionValue.equals(mActivity.getString(R.string.pref_camera_exy_slow_motion_default))) {
-                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
-                    if (!vhdrDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
-                        RotateTextToast.makeText(mActivity, R.string.toast_videohfr_disable_vhdr,
-                                Toast.LENGTH_LONG).show();
-                    }
-            }
-        }
-        if (pref != null && CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE.equals(pref.getKey())) {
-            String fastfpsvalue = pref.getValue();
-            if (!fastfpsvalue.equals(mActivity.getString(R.string.pref_camera_exy_high_framerate_default))) {
-                    String disDisable = mActivity.getString(R.string.pref_camera_exy_dis_default);
-                    String vhdrDisable = mActivity.getString(R.string.pref_camera_exy_video_hdr_default);
-                    if (!disDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_DIS, disDisable))) {
-                        mRestartCam = true;
-                        RotateTextToast.makeText(mActivity, R.string.toast_video_ffps_disable_IS,
-                                Toast.LENGTH_LONG).show();
-                    }
-                    if (!vhdrDisable.equals(
-                            mPreferences.getString(CameraSettings.KEY_EXYNOS_VIDEO_HDR, vhdrDisable))) {
-                        RotateTextToast.makeText(mActivity, R.string.videoffps_disable_vhdr,
-                                Toast.LENGTH_LONG).show();
-                    }
-            }
-        }
         onSharedPreferenceChanged();
     }
 
@@ -2823,14 +2663,6 @@ public class SVideoModule implements CameraModule,
             } else {
                 setCameraParameters(false);
             }
-            if (mRestartCam){
-                mPendingSwitchCameraId = mCameraId;
-// Uncomment for debbuging
-//            RotateTextToast.makeText(mActivity, R.string.toast_restarting_info,
-//                                Toast.LENGTH_SHORT).show();
-                switchCamera();
-            }
-            mRestartCam = false;
             mRestartPreview = false;
             Storage.setSaveSDCard(
                 mPreferences.getString(CameraSettings.KEY_CAMERA_SAVEPATH, "0").equals("1"));
@@ -3111,18 +2943,6 @@ public class SVideoModule implements CameraModule,
     public void onButtonContinue() {
         resumeVideoRecording();
     }
-
-    private void updatePowerMode() {
-        String lpmSupported = mParameters.get("low-power-mode-supported");
-        if ((lpmSupported != null) && "true".equals(lpmSupported)) {
-            if (!mIsDISEnabled && !mIsFlipEnabled) {
-                mParameters.set("low-power-mode", "enable");
-            } else {
-                mParameters.set("low-power-mode", "disable");
-            }
-        }
-    }
-
 
     public void startFaceDetection() {
         if (mCameraDevice == null) return;
