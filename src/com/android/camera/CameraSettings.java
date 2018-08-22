@@ -1996,6 +1996,9 @@ public class CameraSettings {
             filterUnsupportedOptions(group, exynos_videoQuality, getSupportedExynosVideoQualities(
                     mCameraId, mParameters));
         }
+        if (exynos_disMode != null) {
+            filterUnsupportedOptions(group, exynos_disMode, getSupportedExynosDisMode(mParameters));
+        }
     }
 
     public static List<String> getSupportedRTHdrModes(Parameters params) {
@@ -2068,5 +2071,11 @@ public class CameraSettings {
         }
         Log.w(TAG, "No supported video size matches, using the first reported size");
         return supported.get(0);
+    }
+    public static List<String> getSupportedExynosDisMode(Parameters params) {
+        if ((params.get(KEY_EXYNOS_VDIS_MODE)) == null) {
+            return null;
+        }
+        return split("off,on");
     }
 }
