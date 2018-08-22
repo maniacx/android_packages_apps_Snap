@@ -1711,7 +1711,7 @@ public class SVideoModule implements CameraModule,
             mMediaRecorder.setCaptureRate(captureRate);
 
             // for HFR, encoder's taget-framerate = 30fps (from profile)
-            int targetFrameRate = isSlowMotion ? 30 : mProfile.videoFrameRate;
+            int targetFrameRate = mProfile.videoFrameRate;
 
             Log.i(TAG, "Setting target fps = " + targetFrameRate);
             mMediaRecorder.setVideoFrameRate(targetFrameRate);
