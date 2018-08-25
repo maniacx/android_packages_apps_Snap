@@ -110,7 +110,6 @@ public class SVideoMenu extends MenuController
                 CameraSettings.KEY_VIDEOCAMERA_FLASH_MODE,
                 CameraSettings.KEY_EXYNOS_VIDEO_QUALITY,
                 CameraSettings.KEY_EXYNOS_HIGH_FRAME_RATE,
-                CameraSettings.KEY_EXYNOS_SLOW_MOTION,
                 CameraSettings.KEY_EXYNOS_VIDEO_HDR,
                 CameraSettings.KEY_MAX_BRIGHTNESS,
                 CameraSettings.KEY_POWER_SHUTTER,
