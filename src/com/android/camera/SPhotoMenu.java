@@ -600,7 +600,6 @@ public class SPhotoMenu extends MenuController
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_WHITE_BALANCE, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SATURATION, false);
             popup1.setPreferenceEnabled(CameraSettings.KEY_EXYNOS_SHARPNESS, false);
-            popup1.setPreferenceEnabled(CameraSettings.KEY_FLASH_MODE, false);
             mMeteringSwitcher.setVisibility(View.GONE);
             mUI.getCameraControls().removeFromViewList(mMeteringSwitcher);
         } else {
